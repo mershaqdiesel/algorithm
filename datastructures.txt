@@ -1,0 +1,17 @@
+Datastructures          Algorithms
+
+-List                   -Shortest Path
+-Array                  -Knapsack
+-Stack                  -A*
+-Queue                  -
+-Deque                  -
+-BTree                  -
+-AVLTree                -
+-Set                    -
+-Map                    -
+-HashTable              -
+-Heap                   -
+-DisjoinSet             -
+-RedBlackTree           -
+-QuadTree               -
+-OctTree                -
