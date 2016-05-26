@@ -4,20 +4,26 @@
 
 #include <memory>
 
+#include "IITerable.h"
+
 namespace algo
 {
 	template<typename T, typename Allocator = std::allocator>
-	class List
+	class List : public IIterable
 	{
 	public:
 		List();
 		~List();
 
-		void PushBack(const T& t);
 		void PushFront(const T& t);
-
-		T PopFront();
-		T PopBack();
+		void PopFront();
+		const T& Front() const;
+		T& Front();
+		
+		void PushBack(const T& t);
+		void PopBack();
+		const T& Back() const;
+		T& Back();
 
 	private:
 		class Node
@@ -27,12 +33,12 @@ namespace algo
 			Node *prev;
 		};
 
-		Node *head;
-		Node *tail;
+		Node *_head;
+		Node *_tail;
 	};
 	
 	template <typename T, typename Allocator>
-	algo::List<T, Allocator>::List() : head(nullptr), tail(nullptr)
+	algo::List<T, Allocator>::List() : _head(nullptr), _tail(nullptr)
 	{
 
 	}
@@ -40,7 +46,7 @@ namespace algo
 	template <typename T, typename Allocator>
 	algo::List<T, Allocator>::~List()
 	{
-		Node *current = this->head;
+		Node *current = this->_head;
 		while (current != nullptr)
 		{
 			Node *next = current->next;
@@ -57,16 +63,16 @@ namespace algo
 		tmp->prev = nullptr;
 		tmp->next = nullptr;
 
-		if (head == nullptr)
+		if (_head == nullptr)
 		{
-			head = tmp;
-			tail = tmp;
+			_head = tmp;
+			_tail = tmp;
 		}
 		else
 		{
-			tail->next = tmp;
-			tmp->prev = tail;
-			tail = tmp;
+			_tail->next = tmp;
+			tmp->prev = _tail;
+			_tail = tmp;
 		}
 	}
 
@@ -78,16 +84,16 @@ namespace algo
 		tmp->next = nullptr;
 		tmp->prev = nullptr;
 
-		if (tail == nullptr)
+		if (_tail == nullptr)
 		{
-			tail = tmp;
-			head = tmp;
+			_tail = tmp;
+			_head = tmp;
 		}
 		else
 		{
-			tmp->next = head;
-			head->prev = tmp;
-			head = tmp;
+			tmp->next = _head;
+			_head->prev = tmp;
+			_head = tmp;
 		}
 	}
 
@@ -95,17 +101,17 @@ namespace algo
 	T algo::List<T, Allocator>::PopFront()
 	{
 		T retval;
-		if (head == tail && head != nullptr)
+		if (_head == _tail && _head != nullptr)
 		{
-			retval = head->elem;
-			delete head;
-			head = tail = nullptr;
+			retval = _head->elem;
+			delete _head;
+			_head = _tail = nullptr;
 		}
-		else if (head != nullptr)
+		else if (_head != nullptr)
 		{
-			Node *tmp = head;
-			retval = head->elem;
-			head = tmp->next;
+			Node *tmp = _head;
+			retval = _head->elem;
+			_head = tmp->next;
 			tmp->prev = nullptr;
 			delete tmp;
 		}
@@ -116,18 +122,18 @@ namespace algo
 	T algo::List<T, Allocator>::PopBack()
 	{
 		T retval;
-		if (head == tail && tail != nullptr)
+		if (_head == _tail && _tail != nullptr)
 		{
-			retval = tail->elem;
-			delete tail;
-			head = tail = nullptr;
+			retval = _tail->elem;
+			delete _tail;
+			_head = _tail = nullptr;
 		}
-		else if (tail != nullptr)
+		else if (_tail != nullptr)
 		{
-			retval = tail->elem;
-			Node *tmp = tail;
-			tail->prev->next = nullptr;
-			tail = tail->prev;
+			retval = _tail->elem;
+			Node *tmp = _tail;
+			_tail->prev->next = nullptr;
+			_tail = _tail->prev;
 			delete tmp;
 		}
 		return retval;

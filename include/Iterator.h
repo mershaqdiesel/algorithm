@@ -10,7 +10,8 @@ namespace algo
     public:
         virtual bool operator==(const Iterator<T>& rhs) = 0;
         virtual T& operator*() = 0;
-    }
+        virtual void Next() = 0;
+    };
 }
 
 #endif // __ALGO_ITERTOR_H

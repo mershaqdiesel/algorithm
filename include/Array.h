@@ -2,24 +2,36 @@
 #ifndef __ALGO_ARRAY_H
 #define __ALGO_ARRAY_H
 
+#include <memory>
+
+#include "IIterable.h"
+
+using namespace std;
+
 namespace algo
 {
-	template <typename T>
-	class Array
+	template <typename T, typename Allocator = std::allocator>
+	class Array : public IIterable
 	{
 	public:
 		Array();
+		explicit Array(sizt_t capacity);
 		~Array();
 
-		PushBack(const T& t);
-		PushFront(const T& t);
-
-
+		void PushFront(const T& t);
+		void PopFront();
+		const T& Front() const;
+		T& Front();
+		
+		void PushBack(const T& t);
+		void PopBack();
+		const T& Back() const;
+		T& Back(); 
 
 	private:
-		unsigned int capacity;
-		unsigned int length;
-		T* vec;
+		size_t _capacity;
+		size_t _size;
+		T* _vec;
 	};
 }
 
