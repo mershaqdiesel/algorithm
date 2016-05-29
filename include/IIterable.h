@@ -10,8 +10,8 @@ namespace algo
     class IIterable
     {
     public:
-        virtual const Iterator<T>& Begin() = 0;
-        virtual const Iterator<T>& End() = 0;
+        virtual Iterator<T> Begin() = 0;
+        virtual Iterator<T> End() = 0;
     };
 }
 

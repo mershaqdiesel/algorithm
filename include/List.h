@@ -3,141 +3,270 @@
 #define __ALGO_LIST_H
 
 #include <memory>
+#include <initializer_list>
 
+#include "IContainer.h"
 #include "IITerable.h"
 
 namespace algo
 {
-	template<typename T, typename Allocator = std::allocator>
-	class List : public IIterable
+	template<typename T, typename Allocator = std::allocator<T> >
+	class List : public IContainer//, public IIterable
 	{
 	public:
+		// Constructors
 		List();
+		// List(const List& list);
+		// List(List&& list);
+		// List(initializer_list<T> list);
+		
+		// Assignment
+		// List<T, Allocator>& operator=(const List<T, Allocator>& rhs);
+		// List<T, Allocator>& operator=(List<T, Allocator>&& rhs);
+		// List<T, Allocator>& operator=(initializer_list<T> rhs);
+		
+		// Destructor
 		~List();
 
+		// Push
 		void PushFront(const T& t);
-		void PopFront();
-		const T& Front() const;
-		T& Front();
-		
+		// void PushFront(T&& t);
 		void PushBack(const T& t);
+		// void PushFront(T&& t);
+		
+		// Pop
+		void PopFront();
 		void PopBack();
-		const T& Back() const;
-		T& Back();
+		
+		// Accessors
+		// const T& Front() const;
+		// const T& Back() const;
+		
+		// T& Front();
+		// T& Back();
+		
+		// T& operator[](size_t index);
+		
+		size_t Size() const;
+		
+		// Iterator
+		// Iterator<T> Begin();
+        // Iterator<T> End();
 
 	private:
 		class Node
 		{
-			T elem;
-			Node *next;
-			Node *prev;
+			T 		*elem;
+			Node 	*next;
+			Node 	*prev;
 		};
 
 		Node *_head;
 		Node *_tail;
+		Allocator _alloc;
+		size_t _size;
 	};
 	
 	template <typename T, typename Allocator>
-	algo::List<T, Allocator>::List() : _head(nullptr), _tail(nullptr)
+	algo::List<T, Allocator>::List() : _head{nullptr}, _tail{nullptr}, _alloc{}, _size{0}
 	{
-
 	}
+	
+	// template <typename T, typename Allocator>
+	// algo::List<T, Allocator>::List(const List& list)
+	// {
+		
+	// }
+	
+	// template <typename T, typename Allocator>
+	// algo::List<T, Allocator>::List(List&& list)
+	// {
+		
+	// }
+	
+	// template <typename T, typename Allocator>
+	// algo::List<T, Allocator>::List(initializer_list<T> list)
+	// {
+		
+	// }
+	
+	// template <typename T, typename Allocator>
+	// List<T, Allocator>& algo::List<T, Allocator>::operator=(const List<T, Allocator>& rhs)
+	// {
+		
+	// }
+	
+	// template <typename T, typename Allocator>
+	// List<T, Allocator>& algo::List<T, Allocator>::operator=(List<T, Allocator>&& rhs)
+	// {
+		
+	// }
+	
+	// template <typename T, typename Allocator>
+	// List<T, Allocator>& algo::List<T, Allocator>::operator=(initializer_list<T> rhs)
+	// {
+		
+	// }
 
 	template <typename T, typename Allocator>
 	algo::List<T, Allocator>::~List()
 	{
-		Node *current = this->_head;
-		while (current != nullptr)
+		Node *temp = _head;
+		Node *next;
+		
+		while (temp != nullptr)
 		{
-			Node *next = current->next;
-			delete current;
-			current = next;
+			_alloc.destroy(temp->elem);
+			_alloc.deallocate(temp->elem, 1);
+			next = temp->next;
+			delete temp;
+			temp = next;
 		}
+		_size = 0;
 	}
+	
+	template <typename T, typename Allocator>
+	void algo::List<T, Allocator>::PushFront(const T& t)
+	{
+		Node *temp = new Node;
+		temp->elem = _alloc.allocate(1);
+		_alloc.construct(temp->elem, t);
+		temp->next = temp->prev = nullptr;
+		
+		if (_head == nullptr && _tail == nullptr)
+		{
+			_head = _tail = temp;
+		}
+		else
+		{
+			temp->next = _head;
+			_head->prev = temp;
+			_head = temp;
+		}
+		_size++;
+	}
+	
+	// template <typename T, typename Allocator>
+	// void algo::List<T, Allocator>::PushFront(T&& t)
+	// {
+		
+	// }
 
 	template <typename T, typename Allocator>
 	void algo::List<T, Allocator>::PushBack(const T& t)
 	{
-		Node *tmp = new Node;
-		tmp->elem = t;
-		tmp->prev = nullptr;
-		tmp->next = nullptr;
+		Node *temp = new Node;
+		temp->elem = _alloc.allocate(1);
+		_alloc.construct(temp->elem, t);
+		temp->prev = temp->next = nullptr;
+		if (_head == nullptr && _tail == nullptr)
+		{
+			_head = _tail = temp;
+		}
+		else
+		{
+			temp->prev = _tail;
+			_tail->next = temp;
+			_tail = temp;
+		}
+		_size++;
+	}
+	
+	// template <typename T, typename Allocator>
+	// void algo::List<T, Allocator>::PushBack(T&& t)
+	// {
+		
+	// }
 
+	template <typename T, typename Allocator>
+	void algo::List<T, Allocator>::PopFront()
+	{
 		if (_head == nullptr)
 		{
-			_head = tmp;
-			_tail = tmp;
+			return;
 		}
-		else
+		
+		if (_head == _tail)
 		{
-			_tail->next = tmp;
-			tmp->prev = _tail;
-			_tail = tmp;
+			_tail = nullptr;
 		}
+		
+		_alloc.destroy(_head->elem);
+		_alloc.deallocate(_head->elem, 1);
+		Node *temp = _head;
+		_head = _head->next;
+		delete temp;
+		_size--;
 	}
 
 	template <typename T, typename Allocator>
-	void algo::List<T, Allocator>::PushFront(const T& t)
+	void algo::List<T, Allocator>::PopBack()
 	{
-		Node *tmp = new Node;
-		tmp->elem = t;
-		tmp->next = nullptr;
-		tmp->prev = nullptr;
-
 		if (_tail == nullptr)
 		{
-			_tail = tmp;
-			_head = tmp;
+			return;
 		}
-		else
+		
+		if (_head == _tail)
 		{
-			tmp->next = _head;
-			_head->prev = tmp;
-			_head = tmp;
+			_head = nullptr;
 		}
+		
+		_alloc.destroy(_tail->elem);
+		_alloc.deallocate(_tail->elem, 1);
+		Node *temp = _tail;
+		_tail = _tail->prev;
+		delete temp;
+		_size--;
 	}
-
+	
+	// template <typename T, typename Allocator>
+	// const T& algo::List<T, Allocator>::Front() const
+	// {
+		
+	// }
+	
+	// template <typename T, typename Allocator>
+	// const T& algo::List<T, Allocator>::Back() const
+	// {
+		
+	// }
+	
+	// template <typename T, typename Allocator>
+	// T& algo::List<T, Allocator>::Front()
+	// {
+		
+	// }
+	
+	// template <typename T, typename Allocator>
+	// T& algo::List<T, Allocator>::Back()
+	// {
+		
+	// }
+	
+	// template <typename T, typename Allocator>
+	// T& algo::List<T, Allocator>::operator[](size_t index)
+	// {
+		
+	// }
+	
 	template <typename T, typename Allocator>
-	T algo::List<T, Allocator>::PopFront()
+	size_t algo::List<T, Allocator>::Size() const
 	{
-		T retval;
-		if (_head == _tail && _head != nullptr)
-		{
-			retval = _head->elem;
-			delete _head;
-			_head = _tail = nullptr;
-		}
-		else if (_head != nullptr)
-		{
-			Node *tmp = _head;
-			retval = _head->elem;
-			_head = tmp->next;
-			tmp->prev = nullptr;
-			delete tmp;
-		}
-		return retval;
+		return _size;
 	}
-
-	template <typename T, typename Allocator>
-	T algo::List<T, Allocator>::PopBack()
-	{
-		T retval;
-		if (_head == _tail && _tail != nullptr)
-		{
-			retval = _tail->elem;
-			delete _tail;
-			_head = _tail = nullptr;
-		}
-		else if (_tail != nullptr)
-		{
-			retval = _tail->elem;
-			Node *tmp = _tail;
-			_tail->prev->next = nullptr;
-			_tail = _tail->prev;
-			delete tmp;
-		}
-		return retval;
-	}
+	
+	// template <typename T, typename Allocator>
+	// Iterator<T> algo::List<T, Allocator>::Begin()
+	// {
+		
+	// }
+	
+	// template <typename T, typename Allocator>
+	// Iterator<T> algo::List<T, Allocator>::End()
+	// {
+		
+	// }
 }
 
 #endif // __ALGO_LIST_H

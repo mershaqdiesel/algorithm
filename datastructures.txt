@@ -3,15 +3,17 @@ Datastructures          Algorithms
 -List                   -Shortest Path
 -Array                  -Knapsack
 -Stack                  -A*
--Queue                  -
--Deque                  -
--BTree                  -
--AVLTree                -
--Set                    -
--Map                    -
--HashTable              -
--Heap                   -
--DisjoinSet             -
--RedBlackTree           -
--QuadTree               -
--OctTree                -
+-Queue                  -FFT
+-Deque                  -Depth First
+-BTree                  -Bredth First
+-AVLTree                -Tree Travesals
+-Set                    -Traveling Salesman
+-Map                    -Nearest Neighbor
+-HashTable              -Vornoi Diagram
+-Heap                   -Delauny Triangulation
+-DisjoinSet             -Quicksort
+-Trie                   -Mergesort
+-RedBlackTree           -Binary Search
+-QuadTree               -String distance
+-OctTree                -Regular Expressions
+-StateMachine           -Context Free Grammar
