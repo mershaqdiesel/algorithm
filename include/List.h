@@ -11,7 +11,7 @@
 namespace algo
 {
 	template<typename T, typename Allocator = std::allocator<T> >
-	class List : public IContainer//, public IIterable
+	class List : public IContainer<T> //, public IIterable
 	{
 	public:
 		// Constructors
@@ -39,13 +39,13 @@ namespace algo
 		void PopBack();
 		
 		// Accessors
-		// const T& Front() const;
-		// const T& Back() const;
+		const T& Front() const;
+		const T& Back() const;
 		
-		// T& Front();
-		// T& Back();
+		T& Front();
+		T& Back();
 		
-		// T& operator[](size_t index);
+		T& operator[](size_t index);
 		
 		size_t Size() const;
 		
@@ -54,7 +54,7 @@ namespace algo
         // Iterator<T> End();
 
 	private:
-		class Node
+		struct Node
 		{
 			T 		*elem;
 			Node 	*next;
@@ -220,35 +220,40 @@ namespace algo
 		_size--;
 	}
 	
-	// template <typename T, typename Allocator>
-	// const T& algo::List<T, Allocator>::Front() const
-	// {
-		
-	// }
+	template <typename T, typename Allocator>
+	const T& algo::List<T, Allocator>::Front() const
+	{
+		return *(_head->elem);
+	}
 	
-	// template <typename T, typename Allocator>
-	// const T& algo::List<T, Allocator>::Back() const
-	// {
-		
-	// }
+	template <typename T, typename Allocator>
+	const T& algo::List<T, Allocator>::Back() const
+	{
+		return *(_tail->elem);
+	}
 	
-	// template <typename T, typename Allocator>
-	// T& algo::List<T, Allocator>::Front()
-	// {
-		
-	// }
+	template <typename T, typename Allocator>
+	T& algo::List<T, Allocator>::Front()
+	{
+		return *(_head->elem);	
+	}
 	
-	// template <typename T, typename Allocator>
-	// T& algo::List<T, Allocator>::Back()
-	// {
-		
-	// }
+	template <typename T, typename Allocator>
+	T& algo::List<T, Allocator>::Back()
+	{
+		return *(_tail->elem);
+	}
 	
-	// template <typename T, typename Allocator>
-	// T& algo::List<T, Allocator>::operator[](size_t index)
-	// {
-		
-	// }
+	template <typename T, typename Allocator>
+	T& algo::List<T, Allocator>::operator[](size_t index)
+	{
+		Node *itr = _head;
+		for (size_t count = 0; count < index; count++)
+		{
+			itr = itr->next;
+		}
+		return *(itr->elem);
+	}
 	
 	template <typename T, typename Allocator>
 	size_t algo::List<T, Allocator>::Size() const

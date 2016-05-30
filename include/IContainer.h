@@ -12,9 +12,9 @@ namespace algo
     public:
 		// Push
         virtual void PushFront(const T& t) = 0;
-		virtual void PushFront(T&& t) = 0;
+		// virtual void PushFront(T&& t) = 0;
 		virtual void PushBack(const T& t) = 0;
-		virtual void PushBack(T&& t) = 0;
+		// virtual void PushBack(T&& t) = 0;
 		
 		// Pop
 		virtual void PopFront() = 0;
