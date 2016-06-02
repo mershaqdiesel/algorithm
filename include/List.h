@@ -21,9 +21,9 @@ namespace algo
         List(std::initializer_list<T> list);
         
         // Assignment
-        // List<T, Allocator>& operator=(const List<T, Allocator>& rhs);
+        List<T, Allocator>& operator=(const List<T, Allocator>& rhs);
         // List<T, Allocator>& operator=(List<T, Allocator>&& rhs);
-        // List<T, Allocator>& operator=(initializer_list<T> rhs);
+        // List<T, Allocator>& operator=(std::initializer_list<T> rhs);
         
         // Destructor
         ~List();
@@ -71,6 +71,7 @@ namespace algo
         Allocator _alloc;
         size_t _size;
         
+        void Destroy();
         void PushFront(Node *n);
         void PushBack(Node *n);
     };
@@ -87,7 +88,7 @@ namespace algo
         // TODO: [pmd] switch to using iterator
         for (size_t i = 0; i < list._size; ++i)
         {
-            PushBack(const_cast<List<T>&>(list)[i]);
+            PushBack(const_cast<List<T, Allocator>&>(list)[i]);
         }
     }
     
@@ -109,11 +110,17 @@ namespace algo
         }
     }
     
-    // template <typename T, typename Allocator>
-    // List<T, Allocator>& algo::List<T, Allocator>::operator=(const List<T, Allocator>& rhs)
-    // {
-        
-    // }
+    template <typename T, typename Allocator>
+    List<T, Allocator>& algo::List<T, Allocator>::operator=(const List<T, Allocator>& rhs)
+    {
+        Destroy();
+        // TODO: [pmd] switch to using iterator
+        for (size_t i = 0; i < rhs._size; ++i)
+        {
+            PushBack(const_cast<List<T, Allocator>&>(rhs)[i]);
+        }
+        return *this;
+    }
     
     // template <typename T, typename Allocator>
     // List<T, Allocator>& algo::List<T, Allocator>::operator=(List<T, Allocator>&& rhs)
@@ -130,6 +137,12 @@ namespace algo
     template <typename T, typename Allocator>
     algo::List<T, Allocator>::~List()
     {
+        Destroy();
+    }
+    
+    template <typename T, typename Allocator>
+    void algo::List<T, Allocator>::Destroy()
+    {
         Node *temp = _head;
         Node *next;
         while (temp != nullptr)
@@ -141,6 +154,7 @@ namespace algo
             temp = next;
         }
         _size = 0;
+        _head = _tail = nullptr;
     }
     
     template <typename T, typename Allocator>

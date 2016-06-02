@@ -151,6 +151,15 @@ BOOST_AUTO_TEST_CASE( ListMoveCopyConstructor )
 BOOST_AUTO_TEST_CASE( ListInitializerListConstructor )
 {
     cout << 15 << endl;
-    List<int> l = {1,2,3,4};
+    List<int> l{1,2,3,4};
     BOOST_CHECK( l.Size() == 4 );
+}
+
+BOOST_AUTO_TEST_CASE( ListConstAssignmentOperator )
+{
+    cout << 16 << endl;
+    List<int> l{1,2,3,4};
+    List<int> m;
+    m = l;
+    BOOST_CHECK( l.Size() == m.Size() );
 }
