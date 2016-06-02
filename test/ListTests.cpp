@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE( ListConstruction )
 {
     cout << 1 << endl;
     List<int> l;
-    BOOST_CHECK( l.Size() == static_cast<size_t> (0) );
+    BOOST_CHECK( l.Size() == 0 );
 }
 
 BOOST_AUTO_TEST_CASE( ListPushBack )
@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE( ListPushBack )
     l.PushBack(i);
     l.PushBack(i);
     l.PushBack(i);
-    BOOST_CHECK( l.Size() == static_cast<size_t> (3) );
+    BOOST_CHECK( l.Size() == 3 );
 }
 
 BOOST_AUTO_TEST_CASE( ListPopBack )
@@ -36,9 +36,9 @@ BOOST_AUTO_TEST_CASE( ListPopBack )
     List<int> l;
     int i = 1;
     l.PushBack(i);
-    BOOST_CHECK( l.Size() == static_cast<size_t> (1) );
+    BOOST_CHECK( l.Size() == 1 );
     l.PopBack();
-    BOOST_CHECK( l.Size() == static_cast<size_t> (0) );
+    BOOST_CHECK( l.Size() == 0 );
 }
 
 BOOST_AUTO_TEST_CASE( ListPushFront )
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE( ListPushFront )
     l.PushFront(i);
     l.PushFront(i);
     l.PushFront(i);
-    BOOST_CHECK( l.Size() == static_cast<size_t> (3) );
+    BOOST_CHECK( l.Size() == 3 );
 }
 
 BOOST_AUTO_TEST_CASE( ListPopFront )
@@ -58,9 +58,9 @@ BOOST_AUTO_TEST_CASE( ListPopFront )
     List<int> l;
     int i = 1;
     l.PushFront(i);
-    BOOST_CHECK( l.Size() == static_cast<size_t> (1) );
+    BOOST_CHECK( l.Size() == 1 );
     l.PopFront();
-    BOOST_CHECK( l.Size() == static_cast<size_t> (0) );
+    BOOST_CHECK( l.Size() == 0 );
 }
 
 BOOST_AUTO_TEST_CASE( ListFrontNonConst )
@@ -129,4 +129,28 @@ BOOST_AUTO_TEST_CASE( ListPushBackMove )
     List<string> l;
     l.PushBack("foo");
     BOOST_CHECK( l.Back() == "foo" );
+}
+
+BOOST_AUTO_TEST_CASE( ListConstCopyConstructor )
+{
+    cout << 13 << endl;
+    List<int> l = {1};
+    List<int> m{l};
+    m.PushBack(2);
+    BOOST_CHECK( l.Size() == 1 );
+    BOOST_CHECK( m.Size() == 2 );
+}
+
+BOOST_AUTO_TEST_CASE( ListMoveCopyConstructor )
+{
+    cout << 14 << endl;
+    List<int> l{1,2,3,4};
+    List<int> m{std::move(l)};
+}
+
+BOOST_AUTO_TEST_CASE( ListInitializerListConstructor )
+{
+    cout << 15 << endl;
+    List<int> l = {1,2,3,4};
+    BOOST_CHECK( l.Size() == 4 );
 }

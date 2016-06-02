@@ -1,4 +1,4 @@
-    #pragma once
+#pragma once
 #ifndef __ALGO_LIST_H
 #define __ALGO_LIST_H
 
@@ -6,7 +6,7 @@
 #include <initializer_list>
 
 #include "IContainer.h"
-#include "IITerable.h"
+#include "IIterable.h"
 
 namespace algo
 {
@@ -18,7 +18,7 @@ namespace algo
         List();
         List(const List& list);
         List(List&& list);
-        // List(initializer_list<T> list);
+        List(std::initializer_list<T> list);
         
         // Assignment
         // List<T, Allocator>& operator=(const List<T, Allocator>& rhs);
@@ -87,7 +87,7 @@ namespace algo
         // TODO: [pmd] switch to using iterator
         for (size_t i = 0; i < list._size; ++i)
         {
-            PushBack(list[i]);
+            PushBack(const_cast<List<T>&>(list)[i]);
         }
     }
     
@@ -99,11 +99,15 @@ namespace algo
         list._size = 0;
     }
     
-    // template <typename T, typename Allocator>
-    // algo::List<T, Allocator>::List(initializer_list<T> list)
-    // {
-        
-    // }
+    template <typename T, typename Allocator>
+    algo::List<T, Allocator>::List(std::initializer_list<T> list)
+        : _head{nullptr}, _tail{nullptr}, _alloc{}, _size{0}
+    {
+        for (auto x : list)
+        {
+            PushBack(x);
+        }
+    }
     
     // template <typename T, typename Allocator>
     // List<T, Allocator>& algo::List<T, Allocator>::operator=(const List<T, Allocator>& rhs)
