@@ -163,3 +163,12 @@ BOOST_AUTO_TEST_CASE( ListConstAssignmentOperator )
     m = l;
     BOOST_CHECK( l.Size() == m.Size() );
 }
+
+BOOST_AUTO_TEST_CASE( ListMoveAssignmentOperator )
+{
+    cout << 17 << endl;
+    List<int> l{1,2,3,4};
+    List<int> m;
+    m = std::move(l);
+    BOOST_CHECK( m.Size() == 4 );
+}

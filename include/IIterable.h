@@ -12,6 +12,8 @@ namespace algo
     public:
         virtual Iterator<T> Begin() = 0;
         virtual Iterator<T> End() = 0;
+        virtual const Iterator<T> Begin() const = 0;
+        virtual const Iterator<T> End() const = 0;
     };
 }
 

@@ -5,13 +5,15 @@
 #include <memory>
 #include <initializer_list>
 
+#include <iostream>
+
 #include "IContainer.h"
 #include "IIterable.h"
 
 namespace algo
 {
-    template<typename T, typename Allocator = std::allocator<T> >
-    class List : public IContainer<T> //, public IIterable
+    template<typename T, typename Allocator = std::allocator<T>>
+    class List : public IContainer<T>//, public IIterable<T>
     {
     public:
         // Constructors
@@ -22,8 +24,7 @@ namespace algo
         
         // Assignment
         List<T, Allocator>& operator=(const List<T, Allocator>& rhs);
-        // List<T, Allocator>& operator=(List<T, Allocator>&& rhs);
-        // List<T, Allocator>& operator=(std::initializer_list<T> rhs);
+        List<T, Allocator>& operator=(List<T, Allocator>&& rhs);
         
         // Destructor
         ~List();
@@ -52,6 +53,8 @@ namespace algo
         // Iterator
         // Iterator<T> Begin();
         // Iterator<T> End();
+        // const Iterator<T> Begin() const;
+        // const Iterator<T> End() const;
         
         // class Iterator : public Iterator<T>
         // {
@@ -122,17 +125,23 @@ namespace algo
         return *this;
     }
     
-    // template <typename T, typename Allocator>
-    // List<T, Allocator>& algo::List<T, Allocator>::operator=(List<T, Allocator>&& rhs)
-    // {
+    template <typename T, typename Allocator>
+    List<T, Allocator>& algo::List<T, Allocator>::operator=(List<T, Allocator>&& rhs)
+    {
+        Node *temp = _head;
+        _head = rhs._head;
+        rhs._head = temp;
         
-    // }
-    
-    // template <typename T, typename Allocator>
-    // List<T, Allocator>& algo::List<T, Allocator>::operator=(initializer_list<T> rhs)
-    // {
+        temp = _tail;
+        _tail = rhs._tail;
+        rhs._tail = temp;
         
-    // }
+        size_t s = _size;
+        _size = rhs._size;
+        rhs._size = s;
+        
+        return *this;
+    }
 
     template <typename T, typename Allocator>
     algo::List<T, Allocator>::~List()
