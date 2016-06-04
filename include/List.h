@@ -13,7 +13,7 @@
 namespace algo
 {
     template<typename T, typename Allocator = std::allocator<T>>
-    class List : public IContainer<T>//, public IIterable<T>
+    class List : public IContainer<T>, public IIterable<T>
     {
     public:
         // Constructors
@@ -30,36 +30,34 @@ namespace algo
         ~List();
 
         // Push
-        void PushFront(const T& t);
-        void PushFront(T&& t);
-        void PushBack(const T& t);
-        void PushBack(T&& t);
+        void PushFront(const T& t) override;
+        void PushFront(T&& t) override;
+        void PushBack(const T& t) override;
+        void PushBack(T&& t) override;
         
         // Pop
-        void PopFront();
-        void PopBack();
+        void PopFront() override;
+        void PopBack() override;
         
         // Accessors
-        const T& Front() const;
-        const T& Back() const;
+        const T& Front() const override;
+        const T& Back() const override;
         
-        T& Front();
-        T& Back();
+        T& Front() override;
+        T& Back() override;
         
-        T& operator[](size_t index);
+        T& operator[](int) override;
+        const T& operator[](int) const override;
         
-        size_t Size() const;
+        size_t Size() const override;
         
         // Iterator
-        // Iterator<T> Begin();
-        // Iterator<T> End();
-        // const Iterator<T> Begin() const;
-        // const Iterator<T> End() const;
+        class Iterator;
         
-        // class Iterator : public Iterator<T>
-        // {
-            
-        // };
+        algo::Iterator<T> Begin();
+        algo::Iterator<T> End();
+        const algo::Iterator<T> Begin() const;
+        const algo::Iterator<T> End() const;
 
     private:
         struct Node
@@ -91,7 +89,7 @@ namespace algo
         // TODO: [pmd] switch to using iterator
         for (size_t i = 0; i < list._size; ++i)
         {
-            PushBack(const_cast<List<T, Allocator>&>(list)[i]);
+            PushBack(list[i]);
         }
     }
     
@@ -120,7 +118,7 @@ namespace algo
         // TODO: [pmd] switch to using iterator
         for (size_t i = 0; i < rhs._size; ++i)
         {
-            PushBack(const_cast<List<T, Allocator>&>(rhs)[i]);
+            PushBack(rhs[i]);
         }
         return *this;
     }
@@ -305,10 +303,31 @@ namespace algo
     }
     
     template <typename T, typename Allocator>
-    T& algo::List<T, Allocator>::operator[](size_t index)
+    T& algo::List<T, Allocator>::operator[](int index)
     {
+        if (index < 0)
+        {
+            // throw negative_index_execption;    
+        }
+        
         Node *itr = _head;
-        for (size_t count = 0; count < index; count++)
+        for (size_t count = 0; count < static_cast<size_t>(index); count++)
+        {
+            itr = itr->next;
+        }
+        return *(itr->elem);
+    }
+    
+    template <typename T, typename Allocator>
+    const T& algo::List<T, Allocator>::operator[](int index) const
+    {
+        if (index < 0)
+        {
+            // throw negative_index_execption;    
+        }
+        
+        Node *itr = _head;
+        for (size_t count = 0; count < static_cast<size_t>(index); count++)
         {
             itr = itr->next;
         }
@@ -321,17 +340,66 @@ namespace algo
         return _size;
     }
     
-    // template <typename T, typename Allocator>
-    // Iterator<T> algo::List<T, Allocator>::Begin()
-    // {
-        
-    // }
+    template <typename T, typename Allocator>
+    class algo::List<T, Allocator>::Iterator : public algo::Iterator<T>
+    {
+    public:
+        bool operator==(const algo::Iterator<T>& rhs) const override;
+        T& operator*() override;
+        void Next() override;
+    private:
+        Iterator(Node *curr) : _current{curr} {};
+        Node *_current;
+    };
     
-    // template <typename T, typename Allocator>
-    // Iterator<T> algo::List<T, Allocator>::End()
-    // {
-
-    // }
+    template <typename T, typename Allocator>
+    bool algo::List<T, Allocator>::Iterator::operator==(const algo::Iterator<T>& rhs) const
+    {
+        return _current == rhs._current;
+    }
+    
+    template <typename T, typename Allocator>
+    T& algo::List<T, Allocator>::Iterator::operator*()
+    {
+        return *(_current->elem);
+    }
+    
+    template <typename T, typename Allocator>
+    void algo::List<T, Allocator>::Iterator::Next()
+    {
+        if (_current != nullptr && _current->next != nullptr)
+        {
+            _current = _current->next;
+        }
+    }
+    
+    template <typename T, typename Allocator>
+    algo::Iterator<T> algo::List<T, Allocator>::Begin()
+    {
+        algo::List<T, Allocator>::Iterator itr{_head};
+        return reinterpret_cast<algo::Iterator<T>>(itr);
+    }
+    
+    template <typename T, typename Allocator>
+    algo::Iterator<T> algo::List<T, Allocator>::End()
+    {
+        algo::List<T, Allocator>::Iterator itr{_tail};
+        return reinterpret_cast<algo::Iterator<T>>(itr);
+    }
+    
+    template <typename T, typename Allocator>
+    const algo::Iterator<T> algo::List<T, Allocator>::Begin() const
+    {
+        const algo::List<T, Allocator>::Iterator itr{_head};
+        return reinterpret_cast<algo::Iterator<T>>(itr);
+    }
+    
+    template <typename T, typename Allocator>
+    const algo::Iterator<T> algo::List<T, Allocator>::End() const
+    {
+        const algo::List<T, Allocator>::Iterator itr{_tail};
+        return reinterpret_cast<algo::Iterator<T>>(itr);
+    }
 }
 
 #endif // __ALGO_LIST_H

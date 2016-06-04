@@ -27,7 +27,8 @@ namespace algo
         virtual T& Front() = 0;
         virtual T& Back() = 0;
         
-        virtual T& operator[](size_t) = 0;
+        virtual T& operator[](int) = 0;
+        virtual const T& operator[](int) const = 0;
         
         virtual size_t Size() const = 0;
     };

@@ -8,7 +8,7 @@ namespace algo
     class Iterator
     {
     public:
-        virtual bool operator==(const Iterator<T>& rhs) = 0;
+        virtual bool operator==(const Iterator<T>& rhs) const = 0;
         virtual T& operator*() = 0;
         virtual void Next() = 0;
     };
