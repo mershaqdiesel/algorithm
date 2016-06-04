@@ -9,6 +9,7 @@
 
 #include "IContainer.h"
 #include "IIterable.h"
+#include "Iterator.h"
 
 namespace algo
 {
@@ -54,10 +55,10 @@ namespace algo
         // Iterator
         class Iterator;
         
-        algo::Iterator<T> Begin();
-        algo::Iterator<T> End();
-        const algo::Iterator<T> Begin() const;
-        const algo::Iterator<T> End() const;
+        std::unique_ptr<algo::Iterator<T>> Begin() override;
+        std::unique_ptr<algo::Iterator<T>> End() override;
+        std::unique_ptr<const algo::Iterator<T>> Begin() const override;
+        std::unique_ptr<const algo::Iterator<T>> End() const override;
 
     private:
         struct Node
@@ -344,8 +345,9 @@ namespace algo
     class algo::List<T, Allocator>::Iterator : public algo::Iterator<T>
     {
     public:
+        friend class algo::List<T, Allocator>;
         bool operator==(const algo::Iterator<T>& rhs) const override;
-        T& operator*() override;
+        T& Data() override;
         void Next() override;
     private:
         Iterator(Node *curr) : _current{curr} {};
@@ -355,11 +357,11 @@ namespace algo
     template <typename T, typename Allocator>
     bool algo::List<T, Allocator>::Iterator::operator==(const algo::Iterator<T>& rhs) const
     {
-        return _current == rhs._current;
+        return _current == dynamic_cast<const algo::List<T, Allocator>::Iterator&>(rhs)._current;
     }
     
     template <typename T, typename Allocator>
-    T& algo::List<T, Allocator>::Iterator::operator*()
+    T& algo::List<T, Allocator>::Iterator::Data()
     {
         return *(_current->elem);
     }
@@ -374,31 +376,31 @@ namespace algo
     }
     
     template <typename T, typename Allocator>
-    algo::Iterator<T> algo::List<T, Allocator>::Begin()
+    std::unique_ptr<algo::Iterator<T>> algo::List<T, Allocator>::Begin()
     {
-        algo::List<T, Allocator>::Iterator itr{_head};
-        return reinterpret_cast<algo::Iterator<T>>(itr);
+        algo::List<T, Allocator>::Iterator* itr = new algo::List<T, Allocator>::Iterator{_head};
+        return std::unique_ptr<algo::Iterator<T>>{itr};
     }
     
     template <typename T, typename Allocator>
-    algo::Iterator<T> algo::List<T, Allocator>::End()
+    std::unique_ptr<algo::Iterator<T>> algo::List<T, Allocator>::End()
     {
-        algo::List<T, Allocator>::Iterator itr{_tail};
-        return reinterpret_cast<algo::Iterator<T>>(itr);
+        algo::List<T, Allocator>::Iterator *itr = new algo::List<T, Allocator>::Iterator{_tail};
+        return std::unique_ptr<algo::Iterator<T>>{itr};
     }
     
     template <typename T, typename Allocator>
-    const algo::Iterator<T> algo::List<T, Allocator>::Begin() const
+    std::unique_ptr<const algo::Iterator<T>> algo::List<T, Allocator>::Begin() const
     {
-        const algo::List<T, Allocator>::Iterator itr{_head};
-        return reinterpret_cast<algo::Iterator<T>>(itr);
+        const algo::List<T, Allocator>::Iterator *itr = new const algo::List<T, Allocator>::Iterator{_head};
+        return std::unique_ptr<const algo::Iterator<T>>{itr};
     }
     
     template <typename T, typename Allocator>
-    const algo::Iterator<T> algo::List<T, Allocator>::End() const
+    std::unique_ptr<const algo::Iterator<T>> algo::List<T, Allocator>::End() const
     {
-        const algo::List<T, Allocator>::Iterator itr{_tail};
-        return reinterpret_cast<algo::Iterator<T>>(itr);
+        const algo::List<T, Allocator>::Iterator *itr = new const algo::List<T, Allocator>::Iterator{_tail};
+        return std::unique_ptr<const algo::Iterator<T>>{itr};
     }
 }
 
