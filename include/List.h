@@ -347,7 +347,7 @@ namespace algo
     public:
         friend class algo::List<T, Allocator>;
         bool operator==(const algo::Iterator<T>& rhs) const override;
-        T& Data() override;
+        T& operator*() override;
         void Next() override;
     private:
         Iterator(Node *curr) : _current{curr} {};
@@ -361,7 +361,7 @@ namespace algo
     }
     
     template <typename T, typename Allocator>
-    T& algo::List<T, Allocator>::Iterator::Data()
+    T& algo::List<T, Allocator>::Iterator::operator*()
     {
         return *(_current->elem);
     }
