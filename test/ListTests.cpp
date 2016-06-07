@@ -172,3 +172,15 @@ BOOST_AUTO_TEST_CASE( ListMoveAssignmentOperator )
     m = std::move(l);
     BOOST_CHECK( m.Size() == 4 );
 }
+
+BOOST_AUTO_TEST_CASE( ListIterableNonConst )
+{
+    cout << 18 << endl;
+    List<int> l{1,2,3,4,5,6,7,8,9,10};
+    int i = 1;
+    for ( auto itr = l.Begin(); *(itr) != *(l.End()); itr->Next())
+    {
+        BOOST_CHECK( itr->Data() == i );
+        i++;
+    }
+}

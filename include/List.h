@@ -9,7 +9,6 @@
 
 #include "IContainer.h"
 #include "IIterable.h"
-#include "Iterator.h"
 
 namespace algo
 {
@@ -347,7 +346,7 @@ namespace algo
     public:
         friend class algo::List<T, Allocator>;
         bool operator==(const algo::Iterator<T>& rhs) const override;
-        T& operator*() override;
+        T& Data() override;
         void Next() override;
     private:
         Iterator(Node *curr) : _current{curr} {};
@@ -361,7 +360,7 @@ namespace algo
     }
     
     template <typename T, typename Allocator>
-    T& algo::List<T, Allocator>::Iterator::operator*()
+    T& algo::List<T, Allocator>::Iterator::Data()
     {
         return *(_current->elem);
     }
@@ -369,7 +368,7 @@ namespace algo
     template <typename T, typename Allocator>
     void algo::List<T, Allocator>::Iterator::Next()
     {
-        if (_current != nullptr && _current->next != nullptr)
+        if (_current != nullptr)
         {
             _current = _current->next;
         }
@@ -385,7 +384,7 @@ namespace algo
     template <typename T, typename Allocator>
     std::unique_ptr<algo::Iterator<T>> algo::List<T, Allocator>::End()
     {
-        algo::List<T, Allocator>::Iterator *itr = new algo::List<T, Allocator>::Iterator{_tail};
+        algo::List<T, Allocator>::Iterator *itr = new algo::List<T, Allocator>::Iterator{_tail->next};
         return std::unique_ptr<algo::Iterator<T>>{itr};
     }
     
@@ -399,7 +398,7 @@ namespace algo
     template <typename T, typename Allocator>
     std::unique_ptr<const algo::Iterator<T>> algo::List<T, Allocator>::End() const
     {
-        const algo::List<T, Allocator>::Iterator *itr = new const algo::List<T, Allocator>::Iterator{_tail};
+        const algo::List<T, Allocator>::Iterator *itr = new const algo::List<T, Allocator>::Iterator{_tail->next};
         return std::unique_ptr<const algo::Iterator<T>>{itr};
     }
 }
