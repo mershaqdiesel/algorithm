@@ -11,12 +11,18 @@ using namespace std;
 
 namespace algo
 {
-    template <typename T, typename Allocator = std::allocator>
+    template <typename T, typename Allocator = std::allocator<T>>
     class Array : public IContainer<T>, public IIterable<T>
     {
     public:
         Array();
-        explicit Array(sizt_t capacity);
+        explicit Array(size_t capacity);
+        Array(const Array& rhs);
+        Array(Array&& rhs);
+
+        Array<T, Allocator>& operator=(const Array<T, Allocator>& rhs);
+        Array<T, Allocator>& operator=(Array<T, Allocator>&& rhs);
+
         ~Array();
 
         void PushFront(const T& t) override;
@@ -42,10 +48,10 @@ namespace algo
 
         class Iterator;
 
-        std::unique_ptr<Iterator<T>> Begin() override;
-        std::unique_ptr<Iterator<T>> End() override;
-        std::unique_ptr<const Iterator<T>> Begin() const override;
-        std::unique_ptr<const Iterator<T>> End() const override;
+        std::unique_ptr<algo::Iterator<T>> Begin() override;
+        std::unique_ptr<algo::Iterator<T>> End() override;
+        std::unique_ptr<const algo::Iterator<T>> Begin() const override;
+        std::unique_ptr<const algo::Iterator<T>> End() const override;
 
     private:
         size_t _capacity;
@@ -57,16 +63,60 @@ namespace algo
     };
 
     template <typename T, typename Allocator>
-    algo::Array<T, Allocator>::Array() : _capacity{10}, _size{0}, _vec{nullptr}, _alloc{}
+    algo::Array<T, Allocator>::Array()
+        : _capacity{10}, _size{0}, _vec{nullptr}, _alloc{}
     {
         _vec = _alloc.allocate(_capacity);
     }
 
     template <typename T, typename Allocator>
-    algo::Array<T, Allocator>::Array(sizt_t capacity)
+    algo::Array<T, Allocator>::Array(size_t capacity)
         : _capacity{capacity}, _size{0}, _vec{nullptr}, _alloc{}
     {
         _vec = _alloc.allocate(_capacity);
+    }
+
+    template <typename T, typename Allocator>
+    algo::Array<T, Allocator>::Array(const Array& rhs)
+        : _capacity{rhs._capacity}, _size{rhs._size}, _vec{nullptr}, _alloc{rhs._alloc}
+    {
+        _vec = _alloc.allocate(_capacity);
+        for (size_t i = 0; i < rhs._size; ++i)
+        {
+            _alloc.construct(_vec + (i * sizeof(T)), rhs._vec[i]);
+        }
+    }
+
+    template <typename T, typename Allocator>
+    algo::Array<T, Allocator>::Array(Array&& rhs)
+        : _capacity{rhs._capacity}, _size{rhs._size}, _vec{rhs._vec}, _alloc{rhs._alloc}
+    {
+        rhs._vec = nullptr;
+        rhs._capacity = rhs._size = 0;
+    }
+
+    template <typename T, typename Allocator>
+    Array<T, Allocator>& algo::Array<T, Allocator>::operator=(const Array<T, Allocator>& rhs)
+    {
+        _capacity = rhs._capacity;
+        _size = rhs._size;
+        _vec = _alloc.allocate(_capacity);
+        for (size_t i = 0; i < rhs._size; ++i)
+        {
+            _alloc.construct(_vec + (i * sizeof(T)), rhs._vec[i]);
+        }
+        return *this;
+    }
+
+    template <typename T, typename Allocator>
+    Array<T, Allocator>& algo::Array<T, Allocator>::operator=(Array<T, Allocator>&& rhs)
+    {
+        _vec = rhs._vec;
+        _capacity = rhs._capacity;
+        _size = rhs._size;
+        rhs._vec = nullptr;
+        rhs._capacity = rhs._size = 0;
+        return *this;
     }
 
     template <typename T, typename Allocator>
@@ -142,7 +192,7 @@ namespace algo
         for (size_t i = 0; i < _size; ++i)
         {
             _alloc.destroy(_vec + (i * sizeof(T)));
-            _alloc.construct(_vec + (i * sizeof(T)), _vec[i + 1])
+            _alloc.construct(_vec + (i * sizeof(T)), _vec[i + 1]);
         }
         _size--;
     }
@@ -150,9 +200,9 @@ namespace algo
     template <typename T, typename Allocator>
     void algo::Array<T, Allocator>::PopBack()
     {
-        if (size > 0)
+        if (_size > 0)
         {
-            _alloc.destroy(vec + ((_size - 1) * sizeof(T)));
+            _alloc.destroy(_vec + ((_size - 1) * sizeof(T)));
             _size--;
         }
     }
@@ -185,7 +235,7 @@ namespace algo
     template <typename T, typename Allocator>
     T& algo::Array<T, Allocator>::operator[](int index)
     {
-        if (index < 0 || >= _size)
+        if (index < 0 || index >= _size)
         {
             // throw out_of_range 
         }
@@ -193,9 +243,9 @@ namespace algo
     }
 
     template <typename T, typename Allocator>
-    const T& algo::Array<T, Allocator>::operator[](int) const
+    const T& algo::Array<T, Allocator>::operator[](int index) const
     {
-        if (index < 0 || >= _size)
+        if (index < 0 || index >= _size)
         {
             // throw out_of_range 
         }
@@ -212,9 +262,9 @@ namespace algo
     class algo::Array<T, Allocator>::Iterator : public algo::Iterator<T>
     {
         public:
-            bool operator==(const Iterator<T>& rhs) const override;
-            T& Data() { return _array[_index]; } override;
-            void Next() { _index++; } override;
+            bool operator==(const algo::Iterator<T>& rhs) const override;
+            T& Data() override { return _array[_index]; };
+            void Next() override { _index++; };
         private:
             Iterator(T* array, size_t index);
             T* _array;
@@ -222,30 +272,40 @@ namespace algo
     };
 
     template <typename T, typename Allocator>
-    bool algo::Array<T, Allocator>::Iterator operator==(const Iterator<T>& rhs) const
+    bool algo::Array<T, Allocator>::Iterator::operator==(const algo::Iterator<T>& rhs) const
     {
         bool samePtr = _array == dynamic_cast<const algo::Array<T, Allocator>::Iterator&>(rhs)._array;
-        bool sameIndex = _index == dynamic_cast<const algo::Array<T, Allocator>::Iterator&(rhs)._index;
+        bool sameIndex = _index == dynamic_cast<const algo::Array<T, Allocator>::Iterator&>(rhs)._index;
         return (samePtr && sameIndex);
     }
 
     template <typename T, typename Allocator>
     std::unique_ptr<Iterator<T>> algo::Array<T, Allocator>::Begin()
     {
-
+        algo::Array<T, Allocator>::Iterator * itr = new algo::Array<T, Allocator>::Iterator(_vec, 0);
+        return std::unique_ptr<algo::Iterator<T>>{itr};
     }
 
     template <typename T, typename Allocator>
     std::unique_ptr<Iterator<T>> algo::Array<T, Allocator>::End()
-    {}
+    {
+        algo::Array<T, Allocator>::Iterator * itr = new algo::Array<T, Allocator>::Iterator(_vec, _size + 1);
+        return std::unique_ptr<algo::Iterator<T>>{itr};
+    }
 
     template <typename T, typename Allocator>
     std::unique_ptr<const Iterator<T>> algo::Array<T, Allocator>::Begin() const
-    {}
+    {
+        const algo::Array<T, Allocator>::Iterator * itr = new const algo::Array<T, Allocator>::Iterator(_vec, 0);
+        return std::unique_ptr<const algo::Iterator<T>>{itr};
+    }
 
     template <typename T, typename Allocator>
     std::unique_ptr<const Iterator<T>> algo::Array<T, Allocator>::End() const
-    {}
+    {
+        const algo::Array<T, Allocator>::Iterator * itr = new const algo::Array<T, Allocator>::Iterator(_vec, _size + 1);
+        return std::unique_ptr<const algo::Iterator<T>>{itr};
+    }
 }
 
 #endif // __ALGO_ARRAY_H

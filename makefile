@@ -16,7 +16,7 @@ TESTLFLAGS=-lboost_unit_test_framework
 
 OBJECTS=$(addprefix $(OBJDIR)/, )
 
-TESTEXES=$(addprefix $(BINDIR)/, ListTests)
+TESTEXES=$(addprefix $(BINDIR)/, ListTests ArrayTests)
 
 .PHONY: clean
 
