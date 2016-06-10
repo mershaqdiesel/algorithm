@@ -67,21 +67,21 @@ namespace algo
     algo::Array<T, Allocator>::Array()
         : _capacity{10}, _size{0}, _vec{nullptr}, _alloc{}
     {
-        _vec = _alloc.allocate(_capacity * sizeof(T));
+        _vec = _alloc.allocate(_capacity);
     }
 
     template <typename T, typename Allocator>
     algo::Array<T, Allocator>::Array(size_t capacity)
         : _capacity{capacity}, _size{0}, _vec{nullptr}, _alloc{}
     {
-        _vec = _alloc.allocate(_capacity * sizeof(T));
+        _vec = _alloc.allocate(_capacity);
     }
 
     template <typename T, typename Allocator>
     algo::Array<T, Allocator>::Array(const Array& rhs)
         : _capacity{rhs._capacity}, _size{rhs._size}, _vec{nullptr}, _alloc{rhs._alloc}
     {
-        _vec = _alloc.allocate(_capacity * sizeof(T));
+        _vec = _alloc.allocate(_capacity);
         for (size_t i = 0; i < rhs._size; ++i)
         {
             _alloc.construct(_vec + (i * sizeof(T)), rhs._vec[i]);
@@ -101,7 +101,7 @@ namespace algo
     {
         _capacity = rhs._capacity;
         _size = rhs._size;
-        _vec = _alloc.allocate(_capacity * sizeof(T));
+        _vec = _alloc.allocate(_capacity);
         for (size_t i = 0; i < rhs._size; ++i)
         {
             _alloc.construct(_vec + (i * sizeof(T)), rhs._vec[i]);
@@ -129,7 +129,7 @@ namespace algo
     template <typename T, typename Allocator>
     void algo::Array<T, Allocator>::Resize(size_t newCapacity)
     {
-        T* tmp = _alloc.allocate(newCapacity * sizeof(T));
+        T* tmp = _alloc.allocate(newCapacity);
         for (size_t i = 0; i < _size; ++i)
         {
             _alloc.construct(tmp + (i * sizeof(T)), _vec[i]);
