@@ -60,27 +60,28 @@ namespace algo
         Allocator _alloc;
 
         void Resize(size_t);
+        void Destroy(T* vec, size_t size, size_t cap);
     };
 
     template <typename T, typename Allocator>
     algo::Array<T, Allocator>::Array()
         : _capacity{10}, _size{0}, _vec{nullptr}, _alloc{}
     {
-        _vec = _alloc.allocate(_capacity);
+        _vec = _alloc.allocate(_capacity * sizeof(T));
     }
 
     template <typename T, typename Allocator>
     algo::Array<T, Allocator>::Array(size_t capacity)
         : _capacity{capacity}, _size{0}, _vec{nullptr}, _alloc{}
     {
-        _vec = _alloc.allocate(_capacity);
+        _vec = _alloc.allocate(_capacity * sizeof(T));
     }
 
     template <typename T, typename Allocator>
     algo::Array<T, Allocator>::Array(const Array& rhs)
         : _capacity{rhs._capacity}, _size{rhs._size}, _vec{nullptr}, _alloc{rhs._alloc}
     {
-        _vec = _alloc.allocate(_capacity);
+        _vec = _alloc.allocate(_capacity * sizeof(T));
         for (size_t i = 0; i < rhs._size; ++i)
         {
             _alloc.construct(_vec + (i * sizeof(T)), rhs._vec[i]);
@@ -100,7 +101,7 @@ namespace algo
     {
         _capacity = rhs._capacity;
         _size = rhs._size;
-        _vec = _alloc.allocate(_capacity);
+        _vec = _alloc.allocate(_capacity * sizeof(T));
         for (size_t i = 0; i < rhs._size; ++i)
         {
             _alloc.construct(_vec + (i * sizeof(T)), rhs._vec[i]);
@@ -122,11 +123,30 @@ namespace algo
     template <typename T, typename Allocator>
     algo::Array<T, Allocator>::~Array()
     {
+        Destroy(_vec, _size, _capacity);
+    }
+
+    template <typename T, typename Allocator>
+    void algo::Array<T, Allocator>::Resize(size_t newCapacity)
+    {
+        T* tmp = _alloc.allocate(newCapacity * sizeof(T));
         for (size_t i = 0; i < _size; ++i)
         {
-            _alloc.destroy(_vec);
+            _alloc.construct(tmp + (i * sizeof(T)), _vec[i]);
         }
-        _alloc.deallocate(_vec, _capacity);
+        Destroy(_vec, _size, _capacity);
+        _vec = tmp;
+        _capacity = newCapacity;
+    }
+
+    template <typename T, typename Allocator>
+    void algo::Array<T, Allocator>::Destroy(T* vec, size_t size, size_t cap)
+    {
+        for (size_t i = 0; i < size; ++i)
+        {
+            _alloc.destroy(vec);
+        }
+        _alloc.deallocate(vec, cap);
     }
 
     template <typename T, typename Allocator>
@@ -235,7 +255,7 @@ namespace algo
     template <typename T, typename Allocator>
     T& algo::Array<T, Allocator>::operator[](int index)
     {
-        if (index < 0 || index >= _size)
+        if (index < 0 || static_cast<size_t>(index) >= _size)
         {
             // throw out_of_range 
         }
@@ -245,7 +265,7 @@ namespace algo
     template <typename T, typename Allocator>
     const T& algo::Array<T, Allocator>::operator[](int index) const
     {
-        if (index < 0 || index >= _size)
+        if (index < 0 || static_cast<size_t>(index) >= _size)
         {
             // throw out_of_range 
         }
@@ -262,6 +282,7 @@ namespace algo
     class algo::Array<T, Allocator>::Iterator : public algo::Iterator<T>
     {
         public:
+            friend class algo::Array<T, Allocator>;
             bool operator==(const algo::Iterator<T>& rhs) const override;
             T& Data() override { return _array[_index]; };
             void Next() override { _index++; };
@@ -270,6 +291,12 @@ namespace algo
             T* _array;
             size_t _index;
     };
+
+    template <typename T, typename Allocator>
+    algo::Array<T, Allocator>::Iterator::Iterator(T* array, size_t index)
+        : _array{array}, _index{index}
+    {
+    }
 
     template <typename T, typename Allocator>
     bool algo::Array<T, Allocator>::Iterator::operator==(const algo::Iterator<T>& rhs) const
@@ -282,28 +309,28 @@ namespace algo
     template <typename T, typename Allocator>
     std::unique_ptr<Iterator<T>> algo::Array<T, Allocator>::Begin()
     {
-        algo::Array<T, Allocator>::Iterator * itr = new algo::Array<T, Allocator>::Iterator(_vec, 0);
+        algo::Array<T, Allocator>::Iterator * itr = new algo::Array<T, Allocator>::Iterator{_vec, 0};
         return std::unique_ptr<algo::Iterator<T>>{itr};
     }
 
     template <typename T, typename Allocator>
     std::unique_ptr<Iterator<T>> algo::Array<T, Allocator>::End()
     {
-        algo::Array<T, Allocator>::Iterator * itr = new algo::Array<T, Allocator>::Iterator(_vec, _size + 1);
+        algo::Array<T, Allocator>::Iterator * itr = new algo::Array<T, Allocator>::Iterator{_vec, _size + 1};
         return std::unique_ptr<algo::Iterator<T>>{itr};
     }
 
     template <typename T, typename Allocator>
     std::unique_ptr<const Iterator<T>> algo::Array<T, Allocator>::Begin() const
     {
-        const algo::Array<T, Allocator>::Iterator * itr = new const algo::Array<T, Allocator>::Iterator(_vec, 0);
+        const algo::Array<T, Allocator>::Iterator * itr = new const algo::Array<T, Allocator>::Iterator{_vec, 0};
         return std::unique_ptr<const algo::Iterator<T>>{itr};
     }
 
     template <typename T, typename Allocator>
     std::unique_ptr<const Iterator<T>> algo::Array<T, Allocator>::End() const
     {
-        const algo::Array<T, Allocator>::Iterator * itr = new const algo::Array<T, Allocator>::Iterator(_vec, _size + 1);
+        const algo::Array<T, Allocator>::Iterator * itr = new const algo::Array<T, Allocator>::Iterator{_vec, _size + 1};
         return std::unique_ptr<const algo::Iterator<T>>{itr};
     }
 }
