@@ -3,6 +3,7 @@
 #define __ALGO_ARRAY_H
 
 #include <memory>
+#include <initializer_list>
 
 #include "IContainer.h"
 #include "IIterable.h"
@@ -19,6 +20,7 @@ namespace algo
         explicit Array(size_t capacity);
         Array(const Array& rhs);
         Array(Array&& rhs);
+        Array(initializer_list<T> lst);
 
         Array<T, Allocator>& operator=(const Array<T, Allocator>& rhs);
         Array<T, Allocator>& operator=(Array<T, Allocator>&& rhs);
@@ -94,6 +96,17 @@ namespace algo
     {
         rhs._vec = nullptr;
         rhs._capacity = rhs._size = 0;
+    }
+
+    template <typename T, typename Allocator>
+    algo::Array<T, Allocator>::Array(initializer_list<T> lst)
+        : _vec{nullptr}, _capacity{lst.size() * 2}, _size{lst.size()}, _alloc{}
+    {
+        _vec = _alloc.allocate(_capacity);
+        for (auto i : lst)
+        {
+            PushBack(i);
+        }
     }
 
     template <typename T, typename Allocator>
