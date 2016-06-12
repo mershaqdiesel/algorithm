@@ -81,12 +81,12 @@ namespace algo
 
     template <typename T, typename Allocator>
     algo::Array<T, Allocator>::Array(const Array& rhs)
-        : _capacity{rhs._capacity}, _size{rhs._size}, _vec{nullptr}, _alloc{rhs._alloc}
+        : _capacity{rhs._capacity}, _size{rhs._size}, _vec{nullptr}, _alloc{}
     {
         _vec = _alloc.allocate(_capacity);
         for (size_t i = 0; i < rhs._size; ++i)
         {
-            _alloc.construct(_vec + (i * sizeof(T)), rhs._vec[i]);
+            _alloc.construct(&_vec[i], rhs._vec[i]);
         }
     }
 
@@ -100,7 +100,7 @@ namespace algo
 
     template <typename T, typename Allocator>
     algo::Array<T, Allocator>::Array(initializer_list<T> lst)
-        : _vec{nullptr}, _capacity{lst.size() * 2}, _size{lst.size()}, _alloc{}
+        : _capacity{10}, _size{0}, _vec{nullptr}, _alloc{}
     {
         _vec = _alloc.allocate(_capacity);
         for (auto i : lst)
@@ -117,7 +117,7 @@ namespace algo
         _vec = _alloc.allocate(_capacity);
         for (size_t i = 0; i < rhs._size; ++i)
         {
-            _alloc.construct(_vec + (i * sizeof(T)), rhs._vec[i]);
+            _alloc.construct(&_vec[i], rhs._vec[i]);
         }
         return *this;
     }
@@ -145,7 +145,7 @@ namespace algo
         T* tmp = _alloc.allocate(newCapacity);
         for (size_t i = 0; i < _size; ++i)
         {
-            _alloc.construct(tmp + (i * sizeof(T)), _vec[i]);
+            _alloc.construct(&tmp[i], _vec[i]);
         }
         Destroy(_vec, _size, _capacity);
         _vec = tmp;
@@ -157,7 +157,7 @@ namespace algo
     {
         for (size_t i = 0; i < size; ++i)
         {
-            _alloc.destroy(vec);
+            _alloc.destroy(&vec[i]);
         }
         _alloc.deallocate(vec, cap);
     }
@@ -165,56 +165,56 @@ namespace algo
     template <typename T, typename Allocator>
     void algo::Array<T, Allocator>::PushFront(const T& t)
     {
-        if (_size == _capacity - 1)
+        if (_size == _capacity)
         {
             Resize(_capacity * 2);
         }
 
         for (size_t i = _size; i > 0; --i)
         {
-            _alloc.construct(_vec + (i * sizeof(T)), _vec[i - 1]);
-            _alloc.destroy(_vec + (i - 1 * sizeof(T)));
+            _alloc.construct(&_vec[i], _vec[i - 1]);
+            _alloc.destroy(&_vec[i]);
         }
-        _alloc.construct(_vec, t);
+        _alloc.construct(&_vec[0], t);
         _size++;
     }
 
     template <typename T, typename Allocator>
     void algo::Array<T, Allocator>::PushFront(T&& t)
     {
-        if (_size == _capacity - 1)
+        if (_size == _capacity)
         {
             Resize(_capacity * 2);
         }
 
         for (size_t i = _size; i > 0; --i)
         {
-            _alloc.construct(_vec + (i * sizeof(T)), _vec[i - 1]);
-            _alloc.destroy(_vec + (i - 1 * sizeof(T)));
+            _alloc.construct(&_vec[i], _vec[i - 1]);
+            _alloc.destroy(&_vec[i]);
         }
-        _alloc.construct(_vec, t);
+        _alloc.construct(&_vec[0], t);
         _size++;
     }
 
     template <typename T, typename Allocator>
     void algo::Array<T, Allocator>::PushBack(const T& t)
     {
-        if (_size == _capacity - 1)
+        if (_size == _capacity)
         {
             Resize(_capacity * 2);
         }
-        _alloc.construct(_vec + (_size * sizeof(T)), t);
+        _alloc.construct(&_vec[_size], t);
         _size++;
     }
 
     template <typename T, typename Allocator>
     void algo::Array<T, Allocator>::PushBack(T&& t)
     {
-        if (_size == _capacity - 1)
+        if (_size == _capacity)
         {
             Resize(_capacity * 2);
         }
-        _alloc.construct(_vec + (_size * sizeof(T)), t);
+        _alloc.construct(&_vec[_size], t);
         _size++;
     }
     
@@ -222,11 +222,12 @@ namespace algo
     template <typename T, typename Allocator>
     void algo::Array<T, Allocator>::PopFront()
     {
-        for (size_t i = 0; i < _size; ++i)
+        for (size_t i = 0; i < _size - 1; ++i)
         {
-            _alloc.destroy(_vec + (i * sizeof(T)));
-            _alloc.construct(_vec + (i * sizeof(T)), _vec[i + 1]);
+            _alloc.destroy(&_vec[i]);
+            _alloc.construct(&_vec[i], _vec[i + 1]);
         }
+        _alloc.destroy(&_vec[_size - 1]);
         _size--;
     }
 
@@ -235,7 +236,7 @@ namespace algo
     {
         if (_size > 0)
         {
-            _alloc.destroy(_vec + ((_size - 1) * sizeof(T)));
+            _alloc.destroy(&_vec[_size - 1]);
             _size--;
         }
     }
@@ -329,7 +330,7 @@ namespace algo
     template <typename T, typename Allocator>
     std::unique_ptr<Iterator<T>> algo::Array<T, Allocator>::End()
     {
-        algo::Array<T, Allocator>::Iterator * itr = new algo::Array<T, Allocator>::Iterator{_vec, _size + 1};
+        algo::Array<T, Allocator>::Iterator * itr = new algo::Array<T, Allocator>::Iterator{_vec, _size};
         return std::unique_ptr<algo::Iterator<T>>{itr};
     }
 
@@ -343,7 +344,7 @@ namespace algo
     template <typename T, typename Allocator>
     std::unique_ptr<const Iterator<T>> algo::Array<T, Allocator>::End() const
     {
-        const algo::Array<T, Allocator>::Iterator * itr = new const algo::Array<T, Allocator>::Iterator{_vec, _size + 1};
+        const algo::Array<T, Allocator>::Iterator * itr = new const algo::Array<T, Allocator>::Iterator{_vec, _size};
         return std::unique_ptr<const algo::Iterator<T>>{itr};
     }
 }

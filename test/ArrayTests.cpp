@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE( ArrayMoveAssignmentOperator )
 BOOST_AUTO_TEST_CASE( ArrayIterableNonConst )
 {
     cout << 18 << endl;
-    Array<int> a{1,2,3,4,5,6,7,8,9,10};
+    Array<int> a{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     int i = 1;
     for ( auto itr = a.Begin(); *(itr) != *(a.End()); itr->Next())
     {
