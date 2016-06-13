@@ -45,3 +45,6 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(INCDIR)/%.h
 	
 clean:
 	rm -f $(OBJDIR)/*.o $(BINDIR)/*
+
+test: $(TESTEXES)
+	for exe in $^; do ./$$exe; done
