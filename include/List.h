@@ -50,6 +50,8 @@ namespace algo
         const T& operator[](int) const override;
         
         size_t Size() const override;
+
+        void Clear() override;
         
         // Iterator
         class Iterator;
@@ -338,6 +340,12 @@ namespace algo
     size_t algo::List<T, Allocator>::Size() const
     {
         return _size;
+    }
+
+    template <typename T, typename Allocator>
+    void algo::List<T, Allocator>::Clear()
+    {
+        Destroy();
     }
     
     template <typename T, typename Allocator>

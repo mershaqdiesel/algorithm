@@ -2,6 +2,8 @@
 #ifndef __ALGO_STACK_H
 #define __ALGO_STACK_H
 
+#include "Array.h"
+
 namespace algo
 {
     template <typename T, typename Container = algo::Array<T>>
@@ -17,56 +19,65 @@ namespace algo
         void Push(T&& t);
 
         void Pop();
-
-        const T& Top();
         T& Top();
+
+        void Clear();
 
     private:
         Container _container;
     };
 
+    template <typename T, typename Container>
     algo::Stack<T, Container>::Stack() : _container{}
     {
 
     }
 
+    template <typename T, typename Container>
     algo::Stack<T, Container>::Stack(const Stack& rhs) : _container{rhs._container}
     {
 
     }
 
+    template <typename T, typename Container>
     algo::Stack<T, Container>::Stack(Stack&& rhs) : _container{std::move(rhs._container)}
     {
 
     }
 
+    template <typename T, typename Container>
     algo::Stack<T, Container>::~Stack()
     {
     }
 
+    template <typename T, typename Container>
     void algo::Stack<T, Container>::Push(const T& t)
     {
         _container.PushBack(t);
     }
 
+    template <typename T, typename Container>
     void algo::Stack<T, Container>::Push(T&& t)
     {
         _container.PushBack(t);
     }
 
+    template <typename T, typename Container>
     void algo::Stack<T, Container>::Pop()
     {
         _container.PopBack();
     }
 
-    const T& algo::Stack<T, Container>::Top()
+    template <typename T, typename Container>
+    T& algo::Stack<T, Container>::Top()
     {
         return _container.Back();
     }
 
-    T& algo::Stack<T, Container>::Top()
+    template <typename T, typename Container>
+    void algo::Stack<T, Container>::Clear()
     {
-        return _container.Back();
+        _container.Clear();
     }
 }
 

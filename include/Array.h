@@ -48,6 +48,8 @@ namespace algo
         
         size_t Size() const override;
 
+        void Clear() override;
+
         class Iterator;
 
         std::unique_ptr<algo::Iterator<T>> Begin() override;
@@ -290,6 +292,12 @@ namespace algo
     size_t algo::Array<T, Allocator>::Size() const
     {
         return _size;
+    }
+
+    template <typename T, typename Allocator>
+    void algo::Array<T, Allocator>::Clear()
+    {
+        Destroy(_vec, _size, _capacity);
     }
 
     template <typename T, typename Allocator>

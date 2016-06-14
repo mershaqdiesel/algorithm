@@ -31,6 +31,8 @@ namespace algo
         virtual const T& operator[](int) const = 0;
         
         virtual size_t Size() const = 0;
+
+        virtual void Clear() = 0;
     };
 }
 

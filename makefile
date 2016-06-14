@@ -4,10 +4,11 @@ SRCDIR=src
 INCDIR=include
 TESTDIR=test
 
-CC=clang++
-CFLAGS=-std=c++11 -Wall -I$(INCDIR) -O2
+CC=g++
+CFLAGS=-std=c++11 -Wall
+CCFLAGS=-c -I$(INCDIR)
 LFLAGS=
-DFLAGS=-g
+DFLAGS=-g -v
 OUTPUTAS=-o
 
 TESTCC=g++
@@ -22,23 +23,23 @@ TESTEXES=$(addprefix $(BINDIR)/, ListTests ArrayTests)
 
 all: release debug tests
 
-release: #$(BINDIR)/algos
+release: $(BINDIR)/rpcalc
 
-debug: #$(BINDIR)/algos_debug
+debug: $(BINDIR)/rpcalc_debug
 
 tests: $(TESTEXES)
 
-$(BINDIR)/calc: $(SRCDIR)/calc.cpp $(OBJECTS)
+$(BINDIR)/rpcalc: $(OBJDIR)/rpcalc.o
 	$(CC) $^ $(CFLAGS) $(LFLAGS) $(OUTPUTAS) $@
 	
-$(BINDIR)/calc_debug: $(SRCDIR)/calc.cpp $(OBJECTS)
+$(BINDIR)/rpcalc_debug: $(OBJDIR)/rpcalc.o
 	$(CC) $^ $(CFLAGS) $(DFLAGS) $(LFLAGS) $(OUTPUTAS) $@
 	
 $(BINDIR)/%: $(TESTDIR)/%.cpp
 	$(TESTCC) $^ $(TESTCFLAGS) $(OUTPUTAS) $@ $(TESTLFLAGS)
 	
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CC) $^ $(CFLAGS) $(OUTPUTAS) $@
+	$(CC) $^ $(CFLAGS) $(CCFLAGS) $(OUTPUTAS) $@
 	
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(INCDIR)/%.h
 	$(CC) $^ $(CFLAGS) $(OUTPUTAS) $@
