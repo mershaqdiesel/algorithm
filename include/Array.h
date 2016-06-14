@@ -64,7 +64,7 @@ namespace algo
         Allocator _alloc;
 
         void Resize(size_t);
-        void Destroy(T* vec, size_t size, size_t cap);
+        void Destroy(T* vec, size_t& size, size_t cap);
     };
 
     template <typename T, typename Allocator>
@@ -155,13 +155,14 @@ namespace algo
     }
 
     template <typename T, typename Allocator>
-    void algo::Array<T, Allocator>::Destroy(T* vec, size_t size, size_t cap)
+    void algo::Array<T, Allocator>::Destroy(T* vec, size_t& size, size_t cap)
     {
         for (size_t i = 0; i < size; ++i)
         {
             _alloc.destroy(&vec[i]);
         }
         _alloc.deallocate(vec, cap);
+        size = 0;
     }
 
     template <typename T, typename Allocator>
@@ -298,6 +299,7 @@ namespace algo
     void algo::Array<T, Allocator>::Clear()
     {
         Destroy(_vec, _size, _capacity);
+        _vec = _alloc.allocate(_capacity);
     }
 
     template <typename T, typename Allocator>

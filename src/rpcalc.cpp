@@ -90,11 +90,12 @@ double Calculate(Stack<string>& stack)
     return val;
 }
 
+// could probably do this a better way (regex)
 bool IsNumber(const string& num)
 {
     for (auto x : num)
     {
-        if (!isdigit(x))
+        if (!isdigit(x) && x != 'e' && x != 'E' && x != '.' && x != '-')
         {
             return false;
         }
@@ -104,5 +105,5 @@ bool IsNumber(const string& num)
 
 double Convert(const string& num)
 {
-    return atoi(num.c_str());
+    return atof(num.c_str());
 }

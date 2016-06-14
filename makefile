@@ -21,7 +21,7 @@ TESTEXES=$(addprefix $(BINDIR)/, ListTests ArrayTests)
 
 .PHONY: clean
 
-all: release debug tests
+all: release tests
 
 release: $(BINDIR)/rpcalc
 
@@ -32,7 +32,7 @@ tests: $(TESTEXES)
 $(BINDIR)/rpcalc: $(OBJDIR)/rpcalc.o
 	$(CC) $^ $(CFLAGS) $(LFLAGS) $(OUTPUTAS) $@
 	
-$(BINDIR)/rpcalc_debug: $(OBJDIR)/rpcalc.o
+$(BINDIR)/rpcalc_debug: $(OBJDIR)/rpcalc_debug.o
 	$(CC) $^ $(CFLAGS) $(DFLAGS) $(LFLAGS) $(OUTPUTAS) $@
 	
 $(BINDIR)/%: $(TESTDIR)/%.cpp
