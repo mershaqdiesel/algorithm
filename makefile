@@ -28,10 +28,10 @@ debug: #$(BINDIR)/algos_debug
 
 tests: $(TESTEXES)
 
-$(BINDIR)/algos: $(SRCDIR)/main.cpp $(OBJECTS)
+$(BINDIR)/calc: $(SRCDIR)/calc.cpp $(OBJECTS)
 	$(CC) $^ $(CFLAGS) $(LFLAGS) $(OUTPUTAS) $@
 	
-$(BINDIR)/algos_debug: $(SRCDIR)/main.cpp $(OBJECTS)
+$(BINDIR)/calc_debug: $(SRCDIR)/calc.cpp $(OBJECTS)
 	$(CC) $^ $(CFLAGS) $(DFLAGS) $(LFLAGS) $(OUTPUTAS) $@
 	
 $(BINDIR)/%: $(TESTDIR)/%.cpp

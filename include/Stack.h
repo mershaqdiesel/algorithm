@@ -22,8 +22,52 @@ namespace algo
         T& Top();
 
     private:
-        Container<T> _container;
+        Container _container;
     };
+
+    algo::Stack<T, Container>::Stack() : _container{}
+    {
+
+    }
+
+    algo::Stack<T, Container>::Stack(const Stack& rhs) : _container{rhs._container}
+    {
+
+    }
+
+    algo::Stack<T, Container>::Stack(Stack&& rhs) : _container{std::move(rhs._container)}
+    {
+
+    }
+
+    algo::Stack<T, Container>::~Stack()
+    {
+    }
+
+    void algo::Stack<T, Container>::Push(const T& t)
+    {
+        _container.PushBack(t);
+    }
+
+    void algo::Stack<T, Container>::Push(T&& t)
+    {
+        _container.PushBack(t);
+    }
+
+    void algo::Stack<T, Container>::Pop()
+    {
+        _container.PopBack();
+    }
+
+    const T& algo::Stack<T, Container>::Top()
+    {
+        return _container.Back();
+    }
+
+    T& algo::Stack<T, Container>::Top()
+    {
+        return _container.Back();
+    }
 }
 
 #endif // __ALGO_STACK_H
