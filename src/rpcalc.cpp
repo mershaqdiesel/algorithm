@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cmath>
 #include <iostream>
 #include <locale>
 #include <string>
@@ -70,10 +71,10 @@ double Calculate(Stack<string>& stack)
     {
         val = Calculate(stack) / Calculate(stack);
     }
-    // else if (symbol == "^")
-    // {
-    //     val = Calculate(stack) ^ Calculate(stack);
-    // }
+    else if (symbol == "^")
+    {
+        val = pow(Calculate(stack), Calculate(stack));
+    }
     // else if (symbol == "%")
     // {
     //     val = Calculate(stack) % Calculate(stack);
