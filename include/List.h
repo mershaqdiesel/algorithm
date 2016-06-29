@@ -12,6 +12,7 @@
 
 namespace algo
 {
+    // TODO: fix to using empty head and tail nodes
     template<typename T, typename Allocator = std::allocator<T>>
     class List : public IContainer<T>, public IIterable<T>
     {
