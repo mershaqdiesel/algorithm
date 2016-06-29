@@ -65,13 +65,13 @@ namespace algo
     private:
         struct Node
         {
-            T       *elem;
-            Node    *next;
-            Node    *prev;
+            T           *elem;
+            struct Node *next;
+            struct Node *prev;
         };
 
-        Node *_head;
-        Node *_tail;
+        struct Node *_head;
+        struct Node *_tail;
         Allocator _alloc;
         size_t _size;
         

@@ -9,8 +9,14 @@ namespace algo
     {
     public:
         bool Put(const K& key, const V& value);
-        V& operator[](const K&);
+        
         const V& operator[](const K&) const;
+        const IIterable<K>& Keys() const;
+        const IIterable<V>& Values() const;
+
+        V& operator[](const K&);
+        IIterable<K>& Keys();
+        IIterable<V>& Values();
     };
 }
 
