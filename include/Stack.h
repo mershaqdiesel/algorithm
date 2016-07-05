@@ -11,9 +11,12 @@ namespace algo
     {
     public:
         Stack();
-        Stack(const Stack& rhs);
-        Stack(Stack&& rhs);
+        Stack(const Stack<T, Container>& rhs);
+        Stack(Stack<T, Container>&& rhs);
+        Stack<T, Container>& operator=(const Stack<T, Container>& rhs);
+        Stack<T, Container>& operator=(Stack<T, Container>&& rhs);
         ~Stack();
+
 
         void Push(const T& t);
         void Push(T&& t);
@@ -43,6 +46,20 @@ namespace algo
     algo::Stack<T, Container>::Stack(Stack&& rhs) : _container{std::move(rhs._container)}
     {
 
+    }
+
+    template <typename T, typename Container>
+    Stack<T, Container>& algo::Stack<T, Container>::operator=(const Stack<T, Container>& rhs)
+    {
+        _container = rhs._container;
+        return *this;
+    }
+
+    template <typename T, typename Container>
+    Stack<T, Container>& algo::Stack<T, Container>::operator=(Stack<T, Container>&& rhs)
+    {
+        _container = std::move(rhs._container);
+        return *this;
     }
 
     template <typename T, typename Container>
