@@ -49,7 +49,8 @@ namespace algo
         Compare     _compare;
 
         void CopyNode(const struct Node const *src, struct Node **dst);
-        void Destroy(struct Node* n);
+        void DestroyTree(struct Node* n);
+        void DestroyNode(struct Node* n);
         struct Node * CreateNode(const K& key, const V& value);
 
     };
@@ -98,7 +99,7 @@ namespace algo
     template <typename K, typename V, typename Compare, typename KeyAlloc, typename ValueAlloc>
     algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::~BinaryTree()
     {
-        Destroy(_root);   
+        DestroyTree(_root);   
     }
 
     template <typename K, typename V, typename Compare, typename KeyAlloc, typename ValueAlloc>
@@ -152,9 +153,34 @@ namespace algo
     }
 
     template <typename K, typename V, typename Compare, typename KeyAlloc, typename ValueAlloc>
-    const V& algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::operator[](const K&) const
+    const V& algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::operator[](const K& k) const
     {
+        struct Node * n = _root;
+        bool found = n != nullptr;
 
+        while (!found)
+        {
+            // n->key < k
+            if (_compare(*n->key, k))
+            {
+                   
+            }
+            // k < n->key
+            else if (_compare(k, *n->key))
+            {
+
+            }
+            else
+            {
+                found = true;
+            }
+        }
+
+        if (found)
+        {
+            return *n->value;
+        }
+        return nullptr;
     }
 
     template <typename K, typename V, typename Compare, typename KeyAlloc, typename ValueAlloc>
@@ -202,7 +228,23 @@ namespace algo
     }
 
     template <typename K, typename V, typename Compare, typename KeyAlloc, typename ValueAlloc>
-    void algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::Destroy(struct Node* n)
+    void algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::DestroyTree(struct Node* n)
+    {
+        if (n == nullptr)
+        {
+            return;
+        }
+
+        DestroyNode(n);
+
+        DestroyTree(n->left);
+        DestroyTree(n->right);
+
+        delete n;
+    }
+
+    template <typename K, typename V, typename Compare, typename KeyAlloc, typename ValueAlloc>
+    void algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::DestroyNode(struct Node* n)
     {
         if (n == nullptr)
         {
@@ -211,14 +253,8 @@ namespace algo
 
         _keyAlloc.destroy(*n->key);
         _keyAlloc.deallocate(n->key, 1);
-
         _valueAlloc.destroy(*n->value);
         _valueAlloc.deallocate(n->value, 1);
-
-        Destroy(n->left);
-        Destroy(n->right);
-
-        delete n;
     }
 
     template <typename K, typename V, typename Compare, typename KeyAlloc, typename ValueAlloc>
