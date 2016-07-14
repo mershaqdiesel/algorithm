@@ -11,28 +11,28 @@
 
 namespace algo
 {
-    template <typename K, typename V, typename Compare = std::less<K> >
-    class BinaryTree : public IDictonary<K, V>
+    template < typename K, typename V, typename Compare = std::less< K > >
+    class BinaryTree : public IDictonary< K, V >
     {
     public:
         BinaryTree();
-        BinaryTree(const BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>& rhs);
-        BinaryTree(BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>&& rhs);
+        BinaryTree( const BinaryTree< K, V, Compare >& rhs );
+        BinaryTree(BinaryTree< K, V, Compare >&& rhs);
 
-        BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc> operator=(const BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>& rhs);
-        BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc> operator=(BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>&& rhs);
+        BinaryTree< K, V, Compare > operator=( const BinaryTree<K, V, Compare >& rhs );
+        BinaryTree< K, V, Compare > operator=( BinaryTree< K, V, Compare >&& rhs );
 
         ~BinaryTree();
 
-        bool Put(const K& key, const V& value) override;
+        bool Put( const K& key, const V& value ) override;
 
-        const V& operator[](const K&) const override;
-        const IIterable<K>& Keys() const override;
-        const IIterable<V>& Values() const override;
+        const V* operator[]( const K& ) const override;
+        const IIterable< K >& Keys() const override;
+        const IIterable< V >& Values() const override;
 
-        V& operator[](const K&) override;
-        IIterable<K>& Keys() override;
-        IIterable<V>& Values() override;
+        V* operator[]( const K& ) override;
+        IIterable< K >& Keys() override;
+        IIterable< V >& Values() override;
 
     private:
         struct Node
@@ -44,65 +44,65 @@ namespace algo
         };
         
         struct Node *_root;
-        Compare     _compare;
+        Compare      _compare;
 
-        void CopyNode(const struct Node const *src, struct Node **dst);
-        void DestroyTree(struct Node* n);
-        void DestroyNode(struct Node* n);
-        struct Node * CreateNode(const K& key, const V& value);
+        void CopyNode( const struct Node const *src, struct Node **dst );
+        void DestroyTree( struct Node* n );
+        void DestroyNode( struct Node* n );
+        struct Node * CreateNode( const K& key, const V& value );
 
     };
 
     template < typename K, typename V, typename Compare >
-    algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::BinaryTree()
-        : _root{nullptr}, _compare{}
+    algo::BinaryTree< K, V, Compare >::BinaryTree()
+        : _root{ nullptr }, _compare{}
     {
     }
     
     template < typename K, typename V, typename Compare >
-    algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::BinaryTree(const BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>& rhs)
-        : _root{nullptr}, _compare{rhs._compare}
+    algo::BinaryTree< K, V, Compare >::BinaryTree( const BinaryTree< K, V, Compare >& rhs )
+        : _root{ nullptr }, _compare{ rhs._compare }
     {
-        CopyNode(rhs._root, _root);
+        CopyNode( rhs._root, _root );
     }
     
     template < typename K, typename V, typename Compare >
-    algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::BinaryTree(BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>&& rhs)
-        : _root{rhs._root}, _compare{std::move(rhs._compare)}
+    algo::BinaryTree< K, V, Compare >::BinaryTree( BinaryTree< K, V, Compare >&& rhs )
+        : _root{ rhs._root }, _compare{ std::move( rhs._compare ) }
     {
         rhs._root = nullptr;
     }
 
     template < typename K, typename V, typename Compare >
-    BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc> algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::operator=(const BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>& rhs)
+    BinaryTree< K, V, Compare > algo::BinaryTree< K, V, Compare >::operator=( const BinaryTree< K, V, Compare >& rhs )
     {
-        BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc> copy = rhs;
-        std::swap(*this, copy);
+        BinaryTree< K, V, Compare > copy = rhs;
+        std::swap( *this, copy );
         return *this;
     }
 
     template < typename K, typename V, typename Compare >
-    BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc> algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::operator=(BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>&& rhs)
+    BinaryTree< K, V, Compare > algo::BinaryTree< K, V, Compare >::operator=( BinaryTree< K, V, Compare >&& rhs )
     {
-        std::swap(_root, rhs._root);
-        std::swap(_keyAlloc, rhs._keyAlloc);
-        std::swap(_valueAlloc, rhs._valueAlloc);
-        std::swap(_compare, rhs._compare);
+        std::swap( _root, rhs._root );
+        std::swap( _keyAlloc, rhs._keyAlloc );
+        std::swap( _valueAlloc, rhs._valueAlloc );
+        std::swap( _compare, rhs._compare );
         return *this;
     }
 
     template < typename K, typename V, typename Compare >
-    algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::~BinaryTree()
+    algo::BinaryTree< K, V, Compare >::~BinaryTree()
     {
-        DestroyTree(_root);   
+        DestroyTree( _root );   
     }
 
     template < typename K, typename V, typename Compare >
-    bool algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::Put(const K& key, const V& value)
+    bool algo::BinaryTree< K, V, Compare >::Put( const K& key, const V& value )
     {
-        if (_root == nullptr)
+        if ( _root == nullptr )
         {
-            _root = CreateNode(key, value);        
+            _root = CreateNode( key, value );        
             return true;
         }
 
@@ -110,14 +110,14 @@ namespace algo
         bool exists = false;
         struct Node * n = _root;
 
-        while (!inserted && !exists)
+        while ( !inserted || !exists )
         {
             // n->key < key
-            if (_compare(*n->key, key))
+            if ( _compare( *n->key, key ) )
             {
-                if (n->right == nullptr)
+                if ( n->right == nullptr )
                 {
-                    n->right = CreateNode(key, value);
+                    n->right = CreateNode( key, value );
                     inserted = true;
                 }
                 else
@@ -126,11 +126,11 @@ namespace algo
                 }
             }
             // key < n->key
-            else if (_compare(key, *n->key))
+            else if ( _compare( key, *n->key ) )
             {
-                if (n->left == nullptr)
+                if ( n->left == nullptr )
                 {
-                    n->left = CreateNode(key, value);
+                    n->left = CreateNode( key, value );
                     inserted = true;
                 }
                 else
@@ -148,22 +148,36 @@ namespace algo
     }
 
     template < typename K, typename V, typename Compare >
-    const V& algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::operator[](const K& k) const
+    const V* algo::BinaryTree< K, V, Compare >::operator[]( const K& k ) const
     {
         struct Node * n = _root;
         bool found = n != nullptr;
 
-        while (!found)
+        while ( !found )
         {
             // n->key < k
-            if (_compare(*n->key, k))
+            if ( _compare( *n->key, k ) )
             {
-                   
+                if ( n->right != nullptr )
+                {
+                    n = n->right;
+                }
+                else
+                {
+                    return nullptr;
+                }    
             }
             // k < n->key
-            else if (_compare(k, *n->key))
+            else if ( _compare( k, *n->key ) )
             {
-
+                if ( n->left != nullptr )
+                {
+                    n = n->left;
+                }
+                else
+                {
+                    return nullptr;
+                }
             }
             else
             {
@@ -171,7 +185,7 @@ namespace algo
             }
         }
 
-        if (found)
+        if ( found )
         {
             return *n->value;
         }
@@ -179,89 +193,94 @@ namespace algo
     }
 
     template < typename K, typename V, typename Compare >
-    const IIterable<K>& algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::Keys() const
+    const IIterable< K >& algo::BinaryTree< K, V, Compare >::Keys() const
     {
 
     }
 
     template < typename K, typename V, typename Compare >
-    const IIterable<V>& algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::Values() const
+    const IIterable< V >& algo::BinaryTree< K, V, Compare >::Values() const
     {
 
     }
 
     template < typename K, typename V, typename Compare >
-    V& algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::operator[](const K&)
+    V* algo::BinaryTree< K, V, Compare >::operator[]( const K& )
+    {
+        
+    }
+
+    template < typename K, typename V, typename Compare >
+    IIterable< K >& algo::BinaryTree< K, V, Compare >::Keys()
     {
 
     }
 
     template < typename K, typename V, typename Compare >
-    IIterable<K>& algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::Keys()
+    IIterable<V>& algo::BinaryTree< K, V, Compare >::Values()
     {
 
     }
 
     template < typename K, typename V, typename Compare >
-    IIterable<V>& algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::Values()
+    void algo::BinaryTree< K, V, Compare >::CopyNode( const struct Node const *src, struct Node **dst )
     {
-
-    }
-
-    template < typename K, typename V, typename Compare >
-    void algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::CopyNode(const struct Node const *src, struct Node **dst)
-    {
-        if (src == nullptr)
+        if ( src == nullptr )
         {
             *dst = nullptr;
             return;
         }
 
-        (*dst) = CreateNode(src->key, src->value);
-        CopyNode(src->left, &(*dst)->left);
-        CopyNode(src->right, &(*dst)->right);
+        ( *dst ) = CreateNode( src->key, src->value );
+        CopyNode( src->left, &( *dst )->left );
+        CopyNode( src->right, &( *dst )->right );
     }
 
     template < typename K, typename V, typename Compare >
-    void algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::DestroyTree(struct Node* n)
+    void algo::BinaryTree< K, V, Compare >::DestroyTree( struct Node* n )
     {
-        if (n == nullptr)
+        if ( n == nullptr )
         {
             return;
         }
 
-        DestroyNode(n);
+        DestroyNode( n );
 
-        DestroyTree(n->left);
-        DestroyTree(n->right);
+        DestroyTree( n->left );
+        DestroyTree( n->right );
 
         delete n;
     }
 
     template < typename K, typename V, typename Compare >
-    void algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::DestroyNode(struct Node* n)
+    void algo::BinaryTree< K, V, Compare >::DestroyNode( struct Node* n )
     {
-        if (n == nullptr)
+        if ( n == nullptr )
         {
             return;
         }
 
-        _keyAlloc.destroy(*n->key);
-        _keyAlloc.deallocate(n->key, 1);
-        _valueAlloc.destroy(*n->value);
-        _valueAlloc.deallocate(n->value, 1);
+        n->key->~K();
+        delete n->key;
+
+        n->value->~V();
+        delete n->value;
     }
 
     template < typename K, typename V, typename Compare >
-    struct Node * algo::BinaryTree<K, V, Compare, KeyAlloc, ValueAlloc>::CreateNode(const K& key, const V& value)
+    struct Node * algo::BinaryTree< K, V, Compare >::CreateNode( const K& key, const V& value )
     {
         struct Node *n = new struct Node;
-        n->key = _keyAlloc.allocate(1);
-        _keyAlloc.construct(*n->key, key);
-        n->value = _valueAlloc.allocate(1);
-        _valueAlloc.construct(*n->value, value);
+
+        n->key = new K;
+        *n->key = key;
+
+        n->value = new V;
+        *n->value = value;
+
         n->left = nullptr;
         n->right = nullptr;
+
         return n;
     }
 }
