@@ -75,18 +75,19 @@ namespace algo
         size_t _size;
         
         void Destroy();
-        void PushFront( Node *n );
-        void PushBack( Node *n );
+        struct Node* CreateNode();
+        void PushFront( struct Node *n );
+        void PushBack( struct Node *n );
     };
     
     template < typename T >
-    algo::List< T >::List() : _head {nullptr }, _tail{ nullptr} , _size{ 0 }
+    algo::List< T >::List() : _head { CreateNode() }, _tail{ CreateNode() } , _size{ 0 }
     {
     }
     
     template < typename T >
     algo::List< T >::List( const List< T >& list )
-        : _head{ nullptr }, _tail{ nullptr }, _size{ 0 }
+        : _head{ CreateNode() }, _tail{ CreateNode }, _size{ 0 }
     {
         // TODO: [pmd] switch to using iterator
         for ( size_t i = 0; i < list._size; ++i )
@@ -105,7 +106,7 @@ namespace algo
     
     template < typename T >
     algo::List< T >::List( std::initializer_list< T > list )
-        : _head{ nullptr }, _tail{ nullptr }, _size{ 0 }
+        : _head{ CreateNode() }, _tail{ CreateNode() }, _size{ 0 }
     {
         for ( auto x : list )
         {
@@ -165,94 +166,83 @@ namespace algo
         _size = 0;
         _head = _tail = nullptr;
     }
+
+    template < typename T >
+    struct Node* CreateNode()
+    {
+        struct Node *n = new struct Node;
+        n->elem = nullptr;
+        n->next = nullptr;
+        n->prev = nullptr;
+    }
     
     template < typename T >
     void algo::List< T >::PushFront( const T& t )
     {
-        Node *temp = new Node;
+        Node *temp = CreateNode();
         temp->elem = new T;
-        temp->elem = t;
-        temp->next = temp->prev = nullptr;
+        *temp->elem = t;
         PushFront( temp );
     }
     
     template < typename T >
     void algo::List< T >::PushFront( T&& t )
     {
-        Node *temp = new Node;
-        std::swap( temp->elem, t );
-        temp->prev = temp->next = nullptr;
+        Node *temp = CreateNode();
+        std::swap( *temp->elem, t );
         PushFront( temp );
     }
     
     template < typename T >
-    void algo::List< T >::PushFront( Node *n )
+    void algo::List< T >::PushFront( struct Node *n )
     {
-        if ( _head == nullptr && _tail == nullptr )
-        {
-            _head = _tail = n;
-        }
-        else
-        {
-            n->next = _head;
-            _head->prev = n;
-            _head = n;
-        }
+        n->next = _head->next;
+        n->prev = _head;
+        _head->next->prev = n;
+        _head->next = n;
         _size++;
     }
 
     template < typename T >
     void algo::List< T >::PushBack( const T& t )
     {
-        Node *temp = new Node;
+        Node *temp = CreateNode();
         temp->elem = new T;
-        temp->elem = t;
-        temp->prev = temp->next = nullptr;
+        *temp->elem = t;
         PushBack( temp );
     }
     
     template < typename T >
     void algo::List< T >::PushBack( T&& t )
     {
-        Node *temp = new Node;
-        std::swap( temp->elem, t );
-        temp->prev = temp->next = nullptr;
+        Node *temp = CreateNode();
+        std::swap( *temp->elem, t );
         PushBack( temp );
     }
     
     template < typename T >
-    void algo::List< T >::PushBack( Node *n )
+    void algo::List< T >::PushBack( struct Node *n )
     {
-        if ( _head == nullptr && _tail == nullptr )
-        {
-            _head = _tail = n;
-        }
-        else
-        {
-            n->prev = _tail;
-            _tail->next = n;
-            _tail = n;
-        }
+        n->next = _tail;
+        n->prev = _tail->prev;
+        _tail->prev->next = n;
+        _tail->prev = n;
         _size++;
     }
 
     template < typename T >
     void algo::List< T >::PopFront()
     {
-        if ( _head == nullptr )
+        if ( _head->next == _tail )
         {
             return;
         }
         
-        if ( _head == _tail )
-        {
-            _tail = nullptr;
-        }
-        
-        _head->elem->~T();
-        delete _head->elem;
-        Node *temp = _head;
-        _head = _head->next;
+        _head->next->elem->~T();
+        delete _head->next->elem;
+        struct Node *temp = _head->next;
+        _head->next = temp->next;
+        _head->next->prev = _head;
         delete temp;
         _size--;
     }
@@ -260,20 +250,16 @@ namespace algo
     template < typename T >
     void algo::List< T >::PopBack()
     {
-        if ( _tail == nullptr )
+        if ( _tail->prev == _head )
         {
             return;
         }
         
-        if ( _head == _tail )
-        {
-            _head = nullptr;
-        }
-        
-        _tail->elem->~T();
-        delete _tail->elem;
-        Node *temp = _tail;
-        _tail = _tail->prev;
+        _tail->prev->elem->~T();
+        delete _tail->prev->elem;
+        struct Node *temp = _tail;
+        _tail->prev = temp->prev;
+        _tail->prev->next = _tail;
         delete temp;
         _size--;
     }
@@ -335,7 +321,7 @@ namespace algo
     {
         Destroy();
     }
-    
+ 
     template < typename T >
     class algo::List< T >::Iterator : public algo::Iterator< T >
     {
