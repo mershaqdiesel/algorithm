@@ -6,8 +6,6 @@
 #include <memory>
 
 #include "IDictonary.h"
-#include "IIterable.h"
-#include "List.h"
 
 namespace algo
 {
@@ -17,7 +15,7 @@ namespace algo
     public:
         BinaryTree();
         BinaryTree( const BinaryTree< K, V, Compare >& rhs );
-        BinaryTree(BinaryTree< K, V, Compare >&& rhs);
+        BinaryTree( BinaryTree< K, V, Compare >&& rhs );
 
         BinaryTree< K, V, Compare > operator=( const BinaryTree<K, V, Compare >& rhs );
         BinaryTree< K, V, Compare > operator=( BinaryTree< K, V, Compare >&& rhs );
@@ -26,13 +24,13 @@ namespace algo
 
         bool Put( const K& key, const V& value ) override;
 
-        const V* operator[]( const K& ) const override;
-        const IIterable< K >& Keys() const override;
-        const IIterable< V >& Values() const override;
+        const V& operator[]( const K& ) const override;
+        const List< K > Keys() const override;
+        const List< V > Values() const override;
 
-        V* operator[]( const K& ) override;
-        IIterable< K >& Keys() override;
-        IIterable< V >& Values() override;
+        V& operator[]( const K& ) override;
+        List< K > Keys() override;
+        List< V > Values() override;
 
     private:
         struct Node
@@ -148,7 +146,25 @@ namespace algo
     }
 
     template < typename K, typename V, typename Compare >
-    const V* algo::BinaryTree< K, V, Compare >::operator[]( const K& k ) const
+    const V& algo::BinaryTree< K, V, Compare >::operator[]( const K& k ) const
+    {
+        return (*this)[ k ]; 
+    }
+
+    template < typename K, typename V, typename Compare >
+    const List< K > algo::BinaryTree< K, V, Compare >::Keys() const
+    {
+        return this->Keys();
+    }
+
+    template < typename K, typename V, typename Compare >
+    const List< V > algo::BinaryTree< K, V, Compare >::Values() const
+    {
+        return this->Values();
+    }
+
+    template < typename K, typename V, typename Compare >
+    V& algo::BinaryTree< K, V, Compare >::operator[]( const K& )
     {
         struct Node * n = _root;
         bool found = n != nullptr;
@@ -185,41 +201,75 @@ namespace algo
             }
         }
 
-        if ( found )
+        if ( !found )
         {
-            return *n->value;
+            // throw key not found exception
         }
-        return nullptr;
+        return *n->value;
     }
 
     template < typename K, typename V, typename Compare >
-    const IIterable< K >& algo::BinaryTree< K, V, Compare >::Keys() const
+    List< K > algo::BinaryTree< K, V, Compare >::Keys()
     {
-
-    }
-
-    template < typename K, typename V, typename Compare >
-    const IIterable< V >& algo::BinaryTree< K, V, Compare >::Values() const
-    {
-
-    }
-
-    template < typename K, typename V, typename Compare >
-    V* algo::BinaryTree< K, V, Compare >::operator[]( const K& )
-    {
+        List< K > keys;
+        Queue< struct Node * > queue; // depth first
+        queue.PushBack( _root );
         
+        while ( queue.Size() > 0 )
+        {
+            struct Node *current = queue.PopFront();
+            if ( current == nullptr )
+            {
+                continue;
+            } 
+
+            if ( current->key != nullptr )
+            {
+                keys.PushBack( *current->key );
+            }
+            if ( current->left != nullptr )
+            {
+                queue.PushBack( current->left );
+            }
+            if ( current->right != nullptr )
+            {
+                queue.PushBack( current->right );
+            }
+        }
+
+        return keys;
     }
 
     template < typename K, typename V, typename Compare >
-    IIterable< K >& algo::BinaryTree< K, V, Compare >::Keys()
+    List< V > algo::BinaryTree< K, V, Compare >::Values()
     {
+        List< V > values;
+        Queue< struct Node * > queue;
+        queue.PushBack( _root );
 
-    }
+        while ( queue.Size() > 0 )
+        {
+            struct Node *current = queue.PopFront();
+            if ( current == nullptr )
+            {
+                continue;
+            } 
 
-    template < typename K, typename V, typename Compare >
-    IIterable<V>& algo::BinaryTree< K, V, Compare >::Values()
-    {
-
+            if ( current->value != nullptr )
+            {
+                values.PushBack( *current->value )
+            }
+            if ( current->left != nullptr )
+            {
+                queue.PushBack( current->left );
+            }
+            if ( current->right != nullptr )
+            {
+                queue.PushBack( current->right );
+            }
+        }
+        
+        return values;
     }
 
     template < typename K, typename V, typename Compare >
