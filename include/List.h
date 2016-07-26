@@ -269,7 +269,7 @@ namespace algo
         
         _tail->prev->elem->~T();
         delete _tail->prev->elem;
-        struct Node *temp = _tail;
+        struct Node *temp = _tail->prev;
         _tail->prev = temp->prev;
         _tail->prev->next = _tail;
         delete temp;
