@@ -81,14 +81,25 @@ namespace algo
     };
     
     template < typename T >
-    algo::List< T >::List() : _head { CreateNode() }, _tail{ CreateNode() } , _size{ 0 }
+    algo::List< T >::List() : _head { nullptr }, _tail{ nullptr } , _size{ 0 }
     {
+        _head = CreateNode();
+        _tail = CreateNode();
+        _head->next = _tail;
+        _tail->prev = _head;
+        _head->prev = _tail->next = nullptr;
     }
     
     template < typename T >
     algo::List< T >::List( const List< T >& list )
-        : _head{ CreateNode() }, _tail{ CreateNode }, _size{ 0 }
+        : _head{ nullptr }, _tail{ nullptr }, _size{ 0 }
     {
+        _head = CreateNode();
+        _tail = CreateNode();
+        _head->next = _tail;
+        _tail->prev = _head;
+        _head->prev = _tail->next = nullptr;
+        
         // TODO: [pmd] switch to using iterator
         for ( size_t i = 0; i < list._size; ++i )
         {
@@ -168,12 +179,13 @@ namespace algo
     }
 
     template < typename T >
-    struct Node* CreateNode()
+    struct algo::List< T >::Node* algo::List< T >::CreateNode()
     {
         struct Node *n = new struct Node;
         n->elem = nullptr;
         n->next = nullptr;
         n->prev = nullptr;
+        return n;
     }
     
     template < typename T >

@@ -5,12 +5,13 @@
 #include <functional>
 #include <memory>
 
-#include "IDictonary.h"
+#include "IDictionary.h"
+#include "Queue.h"
 
 namespace algo
 {
     template < typename K, typename V, typename Compare = std::less< K > >
-    class BinaryTree : public IDictonary< K, V >
+    class BinaryTree : public IDictionary< K, V >
     {
     public:
         BinaryTree();
@@ -44,7 +45,7 @@ namespace algo
         struct Node *_root;
         Compare      _compare;
 
-        void CopyNode( const struct Node const *src, struct Node **dst );
+        void CopyNode( const struct Node * const src, struct Node **dst );
         void DestroyTree( struct Node* n );
         void DestroyNode( struct Node* n );
         struct Node * CreateNode( const K& key, const V& value );
@@ -83,8 +84,6 @@ namespace algo
     BinaryTree< K, V, Compare > algo::BinaryTree< K, V, Compare >::operator=( BinaryTree< K, V, Compare >&& rhs )
     {
         std::swap( _root, rhs._root );
-        std::swap( _keyAlloc, rhs._keyAlloc );
-        std::swap( _valueAlloc, rhs._valueAlloc );
         std::swap( _compare, rhs._compare );
         return *this;
     }
@@ -164,7 +163,7 @@ namespace algo
     }
 
     template < typename K, typename V, typename Compare >
-    V& algo::BinaryTree< K, V, Compare >::operator[]( const K& )
+    V& algo::BinaryTree< K, V, Compare >::operator[]( const K& k )
     {
         struct Node * n = _root;
         bool found = n != nullptr;
@@ -257,7 +256,7 @@ namespace algo
 
             if ( current->value != nullptr )
             {
-                values.PushBack( *current->value )
+                values.PushBack( *current->value );
             }
             if ( current->left != nullptr )
             {
@@ -273,7 +272,7 @@ namespace algo
     }
 
     template < typename K, typename V, typename Compare >
-    void algo::BinaryTree< K, V, Compare >::CopyNode( const struct Node const *src, struct Node **dst )
+    void algo::BinaryTree< K, V, Compare >::CopyNode( const struct Node * const src, struct Node **dst )
     {
         if ( src == nullptr )
         {
@@ -318,7 +317,7 @@ namespace algo
     }
 
     template < typename K, typename V, typename Compare >
-    struct Node * algo::BinaryTree< K, V, Compare >::CreateNode( const K& key, const V& value )
+    struct algo::BinaryTree< K, V, Compare >::Node * algo::BinaryTree< K, V, Compare >::CreateNode( const K& key, const V& value )
     {
         struct Node *n = new struct Node;
 

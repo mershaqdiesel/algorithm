@@ -4,6 +4,8 @@
 
 #include <memory>
 
+#include "List.h"
+
 namespace algo
 {
     template <typename T, typename Container = algo::List<T>>
@@ -20,17 +22,17 @@ namespace algo
         void PushBack(const T& t);
         void PushBack(T& t);
         void PushFront(const T& t);
-        void PushFron(T& t);
+        void PushFront(T& t);
 
         void PopBack();
         void PopFront();
 
-        const T& Front();
+        const T& Front() const;
         T& Front();
-        const T& Back();
+        const T& Back() const;
         T& Back();
 
-        size_t Size();
+        size_t Size() const;
         void Clear();
 
     private:
@@ -110,7 +112,7 @@ namespace algo
     }
 
     template <typename T, typename Container>
-    const T& algo::Queue<T, Container>::Front()
+    const T& algo::Queue<T, Container>::Front() const
     {
         return _container.Front();
     }
@@ -122,7 +124,7 @@ namespace algo
     }
 
     template <typename T, typename Container>
-    const T& algo::Queue<T, Container>::Back()
+    const T& algo::Queue<T, Container>::Back() const
     {
         return _container.Back();
     }
@@ -134,7 +136,7 @@ namespace algo
     }
 
     template <typename T, typename Container>
-    size_t algo::Queue<T, Container>::Size()
+    size_t algo::Queue<T, Container>::Size() const
     {
         return _container.Size();
     }

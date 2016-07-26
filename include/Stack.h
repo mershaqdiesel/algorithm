@@ -2,6 +2,8 @@
 #ifndef __ALGO_STACK_H
 #define __ALGO_STACK_H
 
+#include <memory>
+
 #include "Array.h"
 
 namespace algo
