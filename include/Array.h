@@ -63,7 +63,6 @@ namespace algo
         T* _vec;
 
         void Resize( size_t newCapacity );
-        void Destroy( T* vec, size_t& size, size_t cap );
     };
 
     template < typename T >
@@ -137,7 +136,7 @@ namespace algo
     template < typename T >
     algo::Array< T >::~Array()
     {
-        Destroy( _vec, _size, _capacity );
+        delete [] _vec;
     }
 
     template < typename T >
@@ -148,20 +147,9 @@ namespace algo
         {
             tmp[ i ] = _vec[ i ];
         }
-        Destroy( _vec, _size, _capacity );
+        delete [] _vec;
         _vec = tmp;
         _capacity = newCapacity;
-    }
-
-    template < typename T >
-    void algo::Array< T >::Destroy( T* vec, size_t& size, size_t cap )
-    {
-        for ( size_t i = 0; i < size; ++i )
-        {
-            (&vec[ i ])->~T();
-        }
-        delete [] vec;
-        size = 0;
     }
 
     template < typename T >
@@ -289,7 +277,7 @@ namespace algo
     template < typename T >
     void algo::Array< T >::Clear()
     {
-        Destroy( _vec, _size, _capacity );
+        delete [] _vec;
         _vec = new T[ _capacity ];
     }
 
