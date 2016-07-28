@@ -24,9 +24,12 @@ namespace algo
         void Push(T&& t);
 
         void Pop();
+
+        const T& Top() const;
         T& Top();
 
         void Clear();
+        size_t Size() const;
 
     private:
         Container _container;
@@ -88,6 +91,12 @@ namespace algo
     }
 
     template <typename T, typename Container>
+    const T& algo::Stack<T, Container>::Top() const
+    {
+        return _container.Back();
+    }
+
+    template <typename T, typename Container>
     T& algo::Stack<T, Container>::Top()
     {
         return _container.Back();
@@ -97,6 +106,12 @@ namespace algo
     void algo::Stack<T, Container>::Clear()
     {
         _container.Clear();
+    }
+
+    template <typename T, typename Container>
+    size_t algo::Stack<T, Container>::Size() const
+    {
+        return _container.Size();
     }
 }
 
