@@ -279,6 +279,7 @@ namespace algo
     {
         delete [] _vec;
         _vec = new T[ _capacity ];
+        _size = 0;
     }
 
     template < typename T >

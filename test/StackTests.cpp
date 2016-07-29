@@ -79,16 +79,66 @@ BOOST_AUTO_TEST_CASE( StackTop )
     Stack< int > s;
     s.Push( 1 );
     BOOST_CHECK( s.Top() == 1 );
-    s.Pop();
+}
+
+BOOST_AUTO_TEST_CASE( StackClear )
+{
+    cout << 7 << endl;
+    Stack< int > s;
+    s.Push( 1 );
     s.Push( 2 );
-    BOOST_CHECK( s.Top() == 2 );
-    s.Pop();
     s.Push( 3 );
-    BOOST_CHECK( s.Top() == 3 );
-    s.Pop();
+    BOOST_CHECK( s.Size() == 3 );
+    s.Clear();
+    BOOST_CHECK( s.Size() == 0 );
 }
 
 BOOST_AUTO_TEST_CASE( StackConstCopyConstructor )
 {
+    cout << 8 << endl;
+    Stack< int > s1;
+    s1.Push( 1 );
+    Stack< int > s2{ s1 };
+    BOOST_CHECK( s1.Top() == s2.Top() );
+    s2.Push( 2 );
+    BOOST_CHECK( s1.Top() == 1 );
+    BOOST_CHECK( s1.Size() == 1 );
+    BOOST_CHECK( s2.Top() == 2 );
+    BOOST_CHECK( s2.Size() == 2 );
+}
 
+BOOST_AUTO_TEST_CASE( StackMoveConstructor )
+{
+    cout << 9 << endl;
+    Stack< int > s;
+    s.Push( 1 );
+    s.Push( 2 );
+    s.Push( 3 );
+    Stack< int > s2( std::move( s ) );
+    BOOST_CHECK( s2.Top() == 3 );
+    BOOST_CHECK( s2.Size() == 3 );
+}
+
+BOOST_AUTO_TEST_CASE( StackConstAssignmentOperator )
+{
+    cout << 10 << endl;
+    Stack< int > s;
+    s.Push( 1 );
+    s.Push( 2 );
+    Stack< int > sprime;
+    sprime = s;
+    BOOST_CHECK( sprime.Top() == 2 );
+    BOOST_CHECK( sprime.Size() == 2 );
+}
+
+BOOST_AUTO_TEST_CASE( StackMoveAssignmentOperator )
+{
+    cout << 11 << endl;
+    Stack< int > s;
+    s.Push( 1 );
+    s.Push( 2 );
+    Stack< int > sprime;
+    sprime = std::move( s );
+    BOOST_CHECK( sprime.Top() == 2 );
+    BOOST_CHECK( sprime.Size() == 2 );
 }
