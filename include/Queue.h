@@ -45,7 +45,7 @@ namespace algo
     }
 
     template <typename T, typename Container>
-    algo::Queue<T, Container>::Queue(const Queue<T, Container>& rhs) 
+    algo::Queue<T, Container>::Queue(const Queue<T, Container>& rhs)
         : _container{rhs._container}
     {
     }
