@@ -179,6 +179,11 @@ namespace algo
     template < typename T >
     void algo::List< T >::Destroy()
     {
+        if ( _head == nullptr && _tail == nullptr )
+        {
+            return;
+        }
+        
         Node *temp = _head->next;
         Node *next;
         while ( temp != _tail && temp != nullptr )
