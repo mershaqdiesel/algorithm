@@ -258,7 +258,6 @@ namespace algo
             return;
         }
         
-        _head->next->elem->~T();
         delete _head->next->elem;
         struct Node *temp = _head->next;
         _head->next = temp->next;
