@@ -179,7 +179,7 @@ namespace algo
                 }
                 else
                 {
-                    return nullptr;
+                    // throw no key exectption
                 }    
             }
             // k < n->key
@@ -191,7 +191,7 @@ namespace algo
                 }
                 else
                 {
-                    return nullptr;
+                    // throw no key exectption
                 }
             }
             else
@@ -216,7 +216,8 @@ namespace algo
         
         while ( queue.Size() > 0 )
         {
-            struct Node *current = queue.PopFront();
+            struct Node *current = queue.Front();
+            queue.PopFront();
             if ( current == nullptr )
             {
                 continue;
@@ -248,7 +249,8 @@ namespace algo
 
         while ( queue.Size() > 0 )
         {
-            struct Node *current = queue.PopFront();
+            struct Node *current = queue.Front();
+            queue.PopFront();
             if ( current == nullptr )
             {
                 continue;
@@ -309,10 +311,7 @@ namespace algo
             return;
         }
 
-        n->key->~K();
         delete n->key;
-
-        n->value->~V();
         delete n->value;
     }
 

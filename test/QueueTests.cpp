@@ -189,3 +189,4 @@ BOOST_AUTO_TEST_CASE( QueueAssignmentOperatorMove )
   q2 = std::move( q );
   BOOST_CHECK( q2.Size() == 2 );
 }
+  
